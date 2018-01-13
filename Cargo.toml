@@ -7,3 +7,4 @@ authors = ["Oliver Schneider <git-no-reply-9879165716479413131@oli-obk.de>"]
 diesel = { version = "1.0.0", features = ["postgres", "chrono"] }
 dotenv = "0.9.0"
 chrono = "0.4.0"
+sha3 = "0.7.2"

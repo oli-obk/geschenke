@@ -3,11 +3,12 @@ CREATE TABLE users (
     name VARCHAR NOT NULL,
     password VARCHAR(88),
     salt VARCHAR(20),
-    autologin VARCHAR(100) NOT NULL,
+    autologin VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR NOT NULL UNIQUE
 );
 
 CREATE INDEX email ON users USING btree (email);
+CREATE INDEX autologin ON users USING btree (autologin);
 
 COMMENT ON COLUMN users.password IS 'base64 of the sha3-512 hash';
 COMMENT ON COLUMN users.autologin IS 'randomly generated "password" for logging in via links';

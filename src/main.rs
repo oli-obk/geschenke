@@ -16,7 +16,7 @@ fn main() {
 
     println!("Displaying {} users", results.len());
     for user in results {
-        println!("{} <{}>", user.name, user.email);
+        println!("{} <{}>: {}", user.name, user.email, user.autologin);
     }
 
     let results = geschenke
@@ -28,5 +28,6 @@ fn main() {
         println!("{}", geschenk.short_description);
     }
 
-    create_user(&connection, "a", "b").unwrap();
+    //create_user(&connection, "a", "b").unwrap();
+    println!("{:?}", login_with_key(&connection, "bar"));
 }
