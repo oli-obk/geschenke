@@ -1,0 +1,6 @@
+[package]
+name = "geschenke"
+version = "0.1.0"
+authors = ["Oliver Schneider <git-no-reply-9879165716479413131@oli-obk.de>"]
+
+[dependencies]
