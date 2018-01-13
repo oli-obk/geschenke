@@ -1,7 +1,7 @@
 CREATE TABLE users (
-    name text,
-    email text,
-    id serial NOT NULL PRIMARY KEY
+    id serial NOT NULL PRIMARY KEY,
+    name text NOT NULL,
+    email text NOT NULL
 );
 
 CREATE INDEX email ON users USING btree (email);
