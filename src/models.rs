@@ -5,6 +5,9 @@ use super::schema::{users, geschenke};
 pub struct User {
     pub id: i32,
     pub name: String,
+    pub password: Option<String>,
+    pub salt: Option<String>,
+    pub autologin: String,
     pub email: String,
 }
 
@@ -13,6 +16,7 @@ pub struct User {
 pub struct NewUser<'a> {
     pub name: &'a str,
     pub email: &'a str,
+    pub autologin: &'a str,
 }
 
 #[derive(Queryable)]

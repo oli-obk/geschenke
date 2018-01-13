@@ -33,6 +33,7 @@ pub fn create_user<'a>(conn: &PgConnection, name: &'a str, email: &'a str) -> Qu
     let new_user = NewUser {
         name,
         email,
+        autologin: "foomp",
     };
 
     let n = diesel::insert_into(users::table)

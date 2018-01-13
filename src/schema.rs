@@ -1,7 +1,7 @@
 table! {
     geschenke (id) {
         id -> Int4,
-        short_description -> Text,
+        short_description -> Varchar,
         description -> Nullable<Text>,
         creator -> Nullable<Int4>,
         receiver -> Int4,
@@ -14,8 +14,11 @@ table! {
 table! {
     users (id) {
         id -> Int4,
-        name -> Text,
-        email -> Text,
+        name -> Varchar,
+        password -> Nullable<Varchar>,
+        salt -> Nullable<Varchar>,
+        autologin -> Varchar,
+        email -> Varchar,
     }
 }
 
