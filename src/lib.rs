@@ -71,7 +71,7 @@ pub fn login_with_password(
     }
 }
 
-pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<()> {
+pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<UserId> {
     use schema::users;
 
     let mut autologin = String::new();
@@ -87,10 +87,10 @@ pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<
         autologin: &autologin,
     };
 
-    let n = diesel::insert_into(users::table)
+    let user_id = diesel::insert_into(users::table)
         .values(&new_user)
-        .execute(conn)?;
+        .returning(users::id)
+        .get_result::<UserId>(conn)?;
 
-    assert_eq!(n, 1, "create_user only adds one entry");
-    Ok(())
+    Ok(user_id)
 }
