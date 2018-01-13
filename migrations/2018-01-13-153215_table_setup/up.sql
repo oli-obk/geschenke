@@ -1,11 +1,10 @@
 CREATE TABLE users (
     id serial NOT NULL PRIMARY KEY,
     name text NOT NULL,
-    email text NOT NULL
+    email text NOT NULL UNIQUE
 );
 
 CREATE INDEX email ON users USING btree (email);
-
 
 CREATE TABLE geschenke (
     id serial NOT NULL PRIMARY KEY,
