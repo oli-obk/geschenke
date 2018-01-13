@@ -1,9 +1,10 @@
 use chrono::NaiveDateTime as DateTime;
 use super::schema::{users, geschenke};
+use UserId;
 
 #[derive(Queryable)]
 pub struct User {
-    pub id: i32,
+    pub id: UserId,
     pub name: String,
     pub password: Option<String>,
     pub salt: Option<String>,
@@ -24,9 +25,9 @@ pub struct Geschenk {
     pub id: i32,
     pub short_description: String,
     pub description: Option<String>,
-    pub creator: Option<i32>,
-    pub receiver: i32,
-    pub gifter: Option<i32>,
+    pub creator: Option<UserId>,
+    pub receiver: UserId,
+    pub gifter: Option<UserId>,
     pub obtained_date: Option<DateTime>,
     pub gifted_date: Option<DateTime>,
 }
@@ -36,6 +37,6 @@ pub struct Geschenk {
 pub struct NewGeschenk<'a> {
     pub short_description: &'a str,
     pub description: &'a str,
-    pub creator: Option<i32>,
-    pub receiver: i32,
+    pub creator: Option<UserId>,
+    pub receiver: UserId,
 }

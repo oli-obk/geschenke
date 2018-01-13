@@ -13,6 +13,8 @@ use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use std::env;
 
+pub type UserId = i32;
+
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
 
@@ -31,12 +33,12 @@ pub enum Error {
 pub fn login_with_key(
     conn: &PgConnection,
     key: &str,
-) -> QueryResult<Option<i32>> {
+) -> QueryResult<Option<UserId>> {
     use schema::users::dsl as users;
     users::users
         .select(users::id)
         .filter(users::autologin.eq(key))
-        .get_result::<i32>(conn)
+        .get_result::<UserId>(conn)
         .optional()
 }
 
@@ -44,22 +46,26 @@ pub fn login_with_password(
     conn: &PgConnection,
     email_address: &str,
     pw: &str,
-) -> QueryResult<bool> {
-    use schema::users::dsl::*;
+) -> QueryResult<Option<UserId>> {
+    use schema::users::dsl as users;
     use sha3::{Digest, Sha3_512};
 
-    let (password_hash, db_salt) = users
-        .select((password, salt))
-        .filter(email.eq(email_address))
-        .get_result::<(Option<String>, Option<String>)>(conn)?;
+    let (password_hash, db_salt, id) = users::users
+        .select((users::password, users::salt, users::id))
+        .filter(users::email.eq(email_address))
+        .get_result::<(Option<String>, Option<String>, UserId)>(conn)?;
     let (password_hash, db_salt) = match (password_hash, db_salt) {
         (Some(pw), Some(s)) => (pw, s),
-        _ => return Ok(false),
+        _ => return Ok(None),
     };
     let mut hasher = Sha3_512::default();
     hasher.input(pw.as_bytes());
     hasher.input(db_salt.as_bytes());
-    Ok(hasher.result().as_slice() == password_hash.as_bytes())
+    if hasher.result().as_slice() == password_hash.as_bytes() {
+        Ok(Some(id))
+    } else {
+        Ok(None)
+    }
 }
 
 pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<()> {
