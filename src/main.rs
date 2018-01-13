@@ -28,5 +28,5 @@ fn main() {
         println!("{}", geschenk.short_description);
     }
 
-    create_user(&connection, "a", "b");
+    create_user(&connection, "a", "b").unwrap();
 }

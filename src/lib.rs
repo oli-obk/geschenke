@@ -7,6 +7,7 @@ extern crate dotenv;
 extern crate chrono;
 
 use diesel::prelude::*;
+use diesel::result::Error as DieselError;
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use std::env;
@@ -20,9 +21,13 @@ pub fn establish_connection() -> PgConnection {
         .expect(&format!("Error connecting to {}", database_url))
 }
 
-use self::models::{NewUser, User};
+use self::models::NewUser;
 
-pub fn create_user<'a>(conn: &PgConnection, name: &'a str, email: &'a str) -> User {
+pub enum Error {
+    DieselError(DieselError),
+}
+
+pub fn create_user<'a>(conn: &PgConnection, name: &'a str, email: &'a str) -> QueryResult<()> {
     use schema::users;
 
     let new_user = NewUser {
@@ -30,8 +35,10 @@ pub fn create_user<'a>(conn: &PgConnection, name: &'a str, email: &'a str) -> Us
         email,
     };
 
-    diesel::insert_into(users::table)
+    let n = diesel::insert_into(users::table)
         .values(&new_user)
-        .get_result(conn)
-        .expect("Error saving new post")
+        .execute(conn)?;
+
+    assert_eq!(n, 1, "create_user only adds one entry");
+    Ok(())
 }
