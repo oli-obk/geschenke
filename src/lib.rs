@@ -6,12 +6,15 @@ extern crate diesel;
 extern crate dotenv;
 extern crate chrono;
 extern crate sha3;
+extern crate rand;
+
 
 use diesel::prelude::*;
 use diesel::result::Error as DieselError;
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use std::env;
+use rand::distributions::{IndependentSample, Range};
 
 pub type UserId = i32;
 
@@ -71,10 +74,17 @@ pub fn login_with_password(
 pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<()> {
     use schema::users;
 
+    let mut autologin = String::new();
+    let range = Range::new(b'a', b'z');
+    let mut rng = rand::thread_rng();
+    for _ in 0..100 {
+        let c = range.ind_sample(&mut rng);
+        autologin.push(c as char)
+    }
     let new_user = NewUser {
         name,
         email,
-        autologin: "foomp",
+        autologin: &autologin,
     };
 
     let n = diesel::insert_into(users::table)
