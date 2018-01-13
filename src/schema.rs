@@ -1,13 +1,13 @@
 table! {
     geschenke (id) {
         id -> Int4,
-        short_description -> Nullable<Text>,
+        short_description -> Text,
         description -> Nullable<Text>,
         creator -> Nullable<Int4>,
         receiver -> Int4,
         gifter -> Nullable<Int4>,
-        obtained_date -> Nullable<Date>,
-        gifted_date -> Nullable<Date>,
+        obtained_date -> Nullable<Timestamp>,
+        gifted_date -> Nullable<Timestamp>,
     }
 }
 

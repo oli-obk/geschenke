@@ -7,6 +7,7 @@ use self::diesel::prelude::*;
 
 fn main() {
     use geschenke::schema::users::dsl::*;
+    use geschenke::schema::geschenke::dsl::*;
 
     let connection = establish_connection();
     let results = users
@@ -16,8 +17,16 @@ fn main() {
 
     println!("Displaying {} users", results.len());
     for user in results {
-        println!("{}", user.name);
-        println!("----------\n");
-        println!("{}", user.email);
+        println!("{} <{}>", user.name, user.email);
+    }
+
+    let results = geschenke
+        .limit(5)
+        .load::<Geschenk>(&connection)
+        .expect("Error loading geschenke");
+
+    println!("Displaying {} geschenke", results.len());
+    for geschenk in results {
+        println!("{}", geschenk.short_description);
     }
 }

@@ -10,7 +10,7 @@ pub struct User {
 #[derive(Queryable)]
 pub struct Geschenk {
     pub id: i32,
-    pub short_description: Option<String>,
+    pub short_description: String,
     pub description: Option<String>,
     pub creator: Option<i32>,
     pub receiver: i32,
