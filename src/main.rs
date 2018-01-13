@@ -11,7 +11,6 @@ fn main() {
 
     let connection = establish_connection();
     let results = users
-        .limit(5)
         .load::<User>(&connection)
         .expect("Error loading users");
 
@@ -21,7 +20,6 @@ fn main() {
     }
 
     let results = geschenke
-        .limit(5)
         .load::<Geschenk>(&connection)
         .expect("Error loading geschenke");
 
@@ -29,4 +27,6 @@ fn main() {
     for geschenk in results {
         println!("{}", geschenk.short_description);
     }
+
+    create_post(&connection, "a", "b");
 }
