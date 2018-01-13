@@ -22,7 +22,7 @@ pub fn establish_connection() -> PgConnection {
 
 use self::models::{NewUser, User};
 
-pub fn create_post<'a>(conn: &PgConnection, name: &'a str, email: &'a str) -> User {
+pub fn create_user<'a>(conn: &PgConnection, name: &'a str, email: &'a str) -> User {
     use schema::users;
 
     let new_user = NewUser {
