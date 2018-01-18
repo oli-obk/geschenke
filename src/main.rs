@@ -1,9 +1,15 @@
+#![feature(plugin)]
+#![plugin(rocket_codegen)]
+
 extern crate geschenke;
 extern crate diesel;
+extern crate rocket;
 
 use self::geschenke::*;
 use self::geschenke::models::*;
 use self::diesel::prelude::*;
+
+pub mod api;
 
 fn main() {
     use geschenke::schema::users::dsl::*;
@@ -30,4 +36,6 @@ fn main() {
 
     //create_user(&connection, "a", "b").unwrap();
     println!("{:?}", login_with_key(&connection, "bar"));
+
+    rocket::ignite().mount("/", routes![api::hello]).launch();
 }
