@@ -2,6 +2,8 @@
 # Install instructions
 
 ```bash
+rustup override set nightly-2018-01-13
+rustup component add rls-preview
 sudo apt-get install libpq-dev
 cargo install diesel_cli --no-default-features --features postgres
 sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list
