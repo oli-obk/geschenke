@@ -1,6 +1,6 @@
 language: rust
 rust:
-- stable
+- nightly-2018-01-13
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y libpq-dev postgresql-9.6
