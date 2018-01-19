@@ -16,6 +16,8 @@ use dotenv::dotenv;
 use std::env;
 use rand::distributions::{IndependentSample, Range};
 
+use self::models::NewUser;
+
 pub type UserId = i32;
 
 pub fn establish_connection() -> PgConnection {
@@ -26,8 +28,6 @@ pub fn establish_connection() -> PgConnection {
     PgConnection::establish(&database_url)
         .expect(&format!("Error connecting to {}", database_url))
 }
-
-use self::models::NewUser;
 
 pub enum Error {
     DieselError(DieselError),
@@ -87,10 +87,10 @@ pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<
         autologin: &autologin,
     };
 
-    let user_id = diesel::insert_into(users::table)
+    diesel::insert_into(users::table)
         .values(&new_user)
         .returning(users::id)
-        .get_result::<UserId>(conn)?;
+        .get_result::<UserId>(conn)
 
     Ok(user_id)
 }
