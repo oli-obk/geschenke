@@ -10,12 +10,19 @@ sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt update
 sudo apt install postgresql-9.6
+
+sudo su - postgres
+psql
+CREATE USER username WITH PASSWORD 'mypw' SUPERUSER;
+CREATE DATABASE geschenke;
+\q
+exit
 ```
 
 # Testing
 
 ```bash
-diesel migrations run
+diesel migration run
 ```
 
 # TODO
