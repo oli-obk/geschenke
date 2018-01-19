@@ -17,8 +17,10 @@ use std::env;
 use rand::distributions::{IndependentSample, Range};
 
 use self::models::NewUser;
+use self::models::NewGeschenk;
 
 pub type UserId = i32;
+pub type GeschenkId = i32;
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
@@ -91,6 +93,20 @@ pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<
         .values(&new_user)
         .returning(users::id)
         .get_result::<UserId>(conn)
+}
 
-    Ok(user_id)
+pub fn add_present(conn: &PgConnection, creator: UserId, recipient: UserId, short_description: &str, description: &str) -> QueryResult<GeschenkId> {
+    use schema::geschenke;
+
+    let new_geschenk = NewGeschenk {
+        creator: Some(creator),
+        receiver: recipient,
+        short_description,
+        description,
+    };
+
+    diesel::insert_into(geschenke::table)
+        .values(&new_geschenk)
+        .returning(geschenke::id)
+        .get_result::<GeschenkId>(conn)
 }
