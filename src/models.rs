@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime as DateTime;
 use super::schema::{users, geschenke};
-use UserId;
+use {UserId, AutologinKey};
 
 #[derive(Queryable, Serialize)]
 pub struct User {
@@ -8,7 +8,7 @@ pub struct User {
     pub name: String,
     pub password: Option<String>,
     pub salt: Option<String>,
-    pub autologin: String,
+    pub autologin: AutologinKey,
     pub email: String,
 }
 

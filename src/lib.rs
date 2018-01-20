@@ -19,6 +19,8 @@ use self::models::NewGeschenk;
 
 pub type UserId = i32;
 pub type GeschenkId = i32;
+pub type AutologinKey = String;
+pub type BorrowedAutologinKey = str;
 
 pub enum Error {
     DieselError(DieselError),
@@ -26,7 +28,7 @@ pub enum Error {
 
 pub fn login_with_key(
     conn: &PgConnection,
-    key: &str,
+    key: &BorrowedAutologinKey,
 ) -> QueryResult<Option<UserId>> {
     use schema::users::dsl as users;
     users::users
@@ -62,7 +64,7 @@ pub fn login_with_password(
     }
 }
 
-pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<UserId> {
+pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<(UserId, AutologinKey)> {
     use schema::users;
 
     let mut autologin = String::new();
@@ -72,16 +74,16 @@ pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<
         let c = range.ind_sample(&mut rng);
         autologin.push(c as char)
     }
-    let new_user = NewUser {
-        name,
-        email,
-        autologin: &autologin,
-    };
 
     diesel::insert_into(users::table)
-        .values(&new_user)
+        .values(&NewUser {
+            name,
+            email,
+            autologin: &autologin,
+        })
         .returning(users::id)
         .get_result::<UserId>(conn)
+        .map(|id| (id, autologin))
 }
 
 pub fn add_present(conn: &PgConnection, creator: UserId, recipient: UserId, short_description: &str, description: &str) -> QueryResult<GeschenkId> {
