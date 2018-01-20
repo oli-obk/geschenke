@@ -1,9 +1,20 @@
 
 # Install instructions
 
+## rls
+
+Not necessary if you use the rls extension from vscode
+
 ```bash
-rustup override set nightly-2018-01-13
+rustup override set nightly-2018-01-20
 rustup component add rls-preview
+rustup component add rust-src
+rustup component add rust-analysis
+```
+
+## postgres
+
+```bash
 sudo apt-get install libpq-dev
 cargo install diesel_cli --no-default-features --features postgres
 sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list
@@ -30,3 +41,7 @@ diesel migration run
 * json interface
     * Rocket
         * R2D2 connection pool
+* tests
+    * *tests*
+        * **tests**
+            * **TESTS!!!!!111einself**
