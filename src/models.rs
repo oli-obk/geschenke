@@ -2,7 +2,7 @@ use chrono::NaiveDateTime as DateTime;
 use super::schema::{users, geschenke};
 use UserId;
 
-#[derive(Queryable)]
+#[derive(Queryable, Serialize)]
 pub struct User {
     pub id: UserId,
     pub name: String,
@@ -20,7 +20,7 @@ pub struct NewUser<'a> {
     pub autologin: &'a str,
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Serialize)]
 pub struct Geschenk {
     pub id: i32,
     pub short_description: String,

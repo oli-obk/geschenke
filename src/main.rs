@@ -4,38 +4,22 @@
 extern crate geschenke;
 extern crate diesel;
 extern crate rocket;
+#[macro_use] extern crate rocket_contrib;
 
-use self::geschenke::*;
-use self::geschenke::models::*;
-use self::diesel::prelude::*;
+extern crate r2d2_diesel;
+extern crate r2d2;
+extern crate dotenv;
 
-pub mod api;
+mod api;
+mod pool;
+
+
 
 fn main() {
-    use geschenke::schema::users::dsl::*;
-    use geschenke::schema::geschenke::dsl::*;
-
-    let connection = establish_connection();
-    let results = users
-        .load::<User>(&connection)
-        .expect("Error loading users");
-
-    println!("Displaying {} users", results.len());
-    for user in results {
-        println!("{} <{}>: {}", user.name, user.email, user.autologin);
-    }
-
-    let results = geschenke
-        .load::<Geschenk>(&connection)
-        .expect("Error loading geschenke");
-
-    println!("Displaying {} geschenke", results.len());
-    for geschenk in results {
-        println!("{}", geschenk.short_description);
-    }
-
-    //create_user(&connection, "a", "b").unwrap();
-    println!("{:?}", login_with_key(&connection, "bar"));
-
-    rocket::ignite().mount("/", routes![api::hello]).launch();
+    rocket::ignite()
+        .mount("/", routes![api::hello])
+        .mount("/geschenke", routes![api::get_geschenke])
+        .mount("/users", routes![api::get_users])
+        .manage(pool::establish_connection())
+        .launch();
 }

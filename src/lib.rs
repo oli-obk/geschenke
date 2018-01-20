@@ -3,17 +3,15 @@ pub mod schema;
 
 #[macro_use]
 extern crate diesel;
-extern crate dotenv;
 extern crate chrono;
 extern crate sha3;
 extern crate rand;
+#[macro_use] extern crate serde_derive;
 
 
 use diesel::prelude::*;
 use diesel::result::Error as DieselError;
 use diesel::pg::PgConnection;
-use dotenv::dotenv;
-use std::env;
 use rand::distributions::{IndependentSample, Range};
 
 use self::models::NewUser;
@@ -21,15 +19,6 @@ use self::models::NewGeschenk;
 
 pub type UserId = i32;
 pub type GeschenkId = i32;
-
-pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
-
-    let database_url = env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url))
-}
 
 pub enum Error {
     DieselError(DieselError),

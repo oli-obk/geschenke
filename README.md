@@ -36,6 +36,10 @@ exit
 diesel migration run
 ```
 
+# Useful things
+
+* Json Viewer for firefox: https://addons.mozilla.org/en-US/firefox/addon/json-lite/
+
 # TODO
 
 * json interface
