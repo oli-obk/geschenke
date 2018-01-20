@@ -13,8 +13,6 @@ extern crate dotenv;
 mod api;
 mod pool;
 
-
-
 fn main() {
     rocket::ignite()
         .mount("/", routes![api::hello])
