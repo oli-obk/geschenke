@@ -1,17 +1,10 @@
 use rocket_contrib::Json;
-use rocket::response::Content;
-use rocket::http::ContentType;
 
 use geschenke::models::{Geschenk, User};
 use geschenke::schema::geschenke;
 use geschenke::schema::users;
 use diesel::{QueryResult, RunQueryDsl};
 use pool::DbConn;
-
-#[get("/")]
-fn hello() -> Content<&'static str> {
-    Content(ContentType::HTML, include_str!("index.html"))
-}
 
 #[get("/")]
 fn get_users(conn: DbConn) -> QueryResult<Json<Vec<User>>> {
