@@ -16,6 +16,7 @@ use rand::distributions::{IndependentSample, Range};
 
 use self::models::NewUser;
 use self::models::NewGeschenk;
+use self::models::Geschenk;
 
 pub type UserId = i32;
 pub type GeschenkId = i32;
@@ -64,6 +65,10 @@ pub fn login_with_password(
     }
 }
 
+pub fn set_pw(conn: &PgConnection, user: UserId, pw: String) -> QueryResult<()> {
+    unimplemented!()
+}
+
 pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<(UserId, AutologinKey)> {
     use schema::users;
 
@@ -101,3 +106,20 @@ pub fn add_present(conn: &PgConnection, creator: UserId, recipient: UserId, shor
         .returning(geschenke::id)
         .get_result::<GeschenkId>(conn)
 }
+
+pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Geschenk>> {
+    use schema::geschenke;
+
+    let query = geschenke::table
+        .filter(geschenke::receiver.eq(recipient));
+
+    if viewer == recipient {
+        // show only the presents that the user created himself
+        query.filter(geschenke::creator.eq(viewer))
+            .load::<Geschenk>(&*conn)
+    } else {
+        query.load::<Geschenk>(&*conn)
+    }
+}
+
+// password recovery
