@@ -10,8 +10,22 @@
 </head>
 
 <body>
-    <a href="geschenke">Database dump of presents</a><br/>
-    <a href="users">Database dump of users</a><br/>
+    <h1>Debugging</h1>
+    <a href="debugging/geschenke">Database dump of presents</a><br/>
+    <a href="debugging/users">Database dump of users</a><br/>
+    <a href="debugging/user_info">info about current user</a><br/>
+    <h1>Login</h1>
+    <form action="account/login_form" method="post">
+      Email: <input name="email"/><br/>
+      Password: <input type="password", name="password"/><br/>
+      <button>Login</button>
+    </form>
+    <h1>Login with key</h1>
+    <form action="account/login_form_key" method="get">
+      Key: <input name="key"/><br/>
+      <button>Login</button>
+    </form>
+    <h1>Register</h1>
     <form action="registration/register_form" method="post">
       Name: <input name="name"/><br/>
       Email: <input name="email"/><br/>

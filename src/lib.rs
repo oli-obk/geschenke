@@ -8,7 +8,6 @@ extern crate sha3;
 extern crate rand;
 #[macro_use] extern crate serde_derive;
 
-
 use diesel::prelude::*;
 use diesel::result::Error as DieselError;
 use diesel::pg::PgConnection;
@@ -27,6 +26,7 @@ pub enum Error {
     DieselError(DieselError),
 }
 
+// Returns `None` if the autologin key does not exist
 pub fn login_with_key(
     conn: &PgConnection,
     key: &BorrowedAutologinKey,
@@ -39,6 +39,8 @@ pub fn login_with_key(
         .optional()
 }
 
+// Returns `None` if the email does not exist,
+// or the user has no password, or the password is wrong
 pub fn login_with_password(
     conn: &PgConnection,
     email_address: &str,
@@ -47,22 +49,23 @@ pub fn login_with_password(
     use schema::users::dsl as users;
     use sha3::{Digest, Sha3_512};
 
-    let (password_hash, db_salt, id) = users::users
+    users::users
         .select((users::password, users::salt, users::id))
         .filter(users::email.eq(email_address))
-        .get_result::<(Option<String>, Option<String>, UserId)>(conn)?;
-    let (password_hash, db_salt) = match (password_hash, db_salt) {
-        (Some(pw), Some(s)) => (pw, s),
-        _ => return Ok(None),
-    };
-    let mut hasher = Sha3_512::default();
-    hasher.input(pw.as_bytes());
-    hasher.input(db_salt.as_bytes());
-    if hasher.result().as_slice() == password_hash.as_bytes() {
-        Ok(Some(id))
-    } else {
-        Ok(None)
-    }
+        .get_result::<(Option<String>, Option<String>, UserId)>(conn)
+        .optional()
+        .map(|result| result.and_then(|(password_hash, salt, id)| {
+            let password_hash = password_hash?;
+            let salt = salt?;
+            let mut hasher = Sha3_512::default();
+            hasher.input(pw.as_bytes());
+            hasher.input(salt.as_bytes());
+            if hasher.result().as_slice() == password_hash.as_bytes() {
+                Some(id)
+            } else {
+                None
+            }
+        }))
 }
 
 pub fn set_pw(conn: &PgConnection, user: UserId, pw: String) -> QueryResult<()> {
