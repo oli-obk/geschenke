@@ -1,5 +1,7 @@
 language: rust
+cache: cargo
 rust:
+# remember to clear travis caches when updating the nightly version
 - nightly-2018-01-20
 before_install:
   - rustup component add rls-preview
