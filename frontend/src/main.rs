@@ -5,12 +5,25 @@ use yew::prelude::*;
 
 type Context = ();
 
-struct Model {
-    n: u32,
+enum Model {
+    Login {
+        email: String,
+        password: String,
+    },
+    LoggedIn,
 }
 
+#[derive(Debug)]
+enum LoginMsg {
+    Email(String),
+    Password(String),
+    Login,
+}
+
+#[derive(Debug)]
 enum Msg {
-    DoIt,
+    Login(LoginMsg),
+    Logout,
 }
 
 impl Component<Context> for Model {
@@ -18,16 +31,38 @@ impl Component<Context> for Model {
     type Properties = ();
     
     fn create(_: &mut Env<Context, Self>) -> Self {
-        Model{
-            n: 0,
+        Model::Login {
+            email: String::new(),
+            password: String::new(),
         }
     }
     // Some details omitted. Explore the examples to get more.
     fn update(&mut self, msg: Self::Msg, _: &mut Env<Context, Self>) -> ShouldRender {
-        match msg {
-            Msg::DoIt => {
-                self.n += 1;
-                true
+        match *self {
+            Model::Login { ref mut email, ref mut password } => match msg {
+                Msg::Login(LoginMsg::Email(e)) => {
+                    *email = e;
+                    false
+                }
+                Msg::Login(LoginMsg::Password(pw)) => {
+                    *password = pw;
+                    false
+                }
+                Msg::Login(LoginMsg::Login) => {
+                    unimplemented!();
+                    true
+                }
+                _ => unreachable!("{:?}", msg),
+            },
+            Model::LoggedIn => match msg {
+                Msg::Logout => {
+                    *self = Model::Login {
+                        email: String::new(),
+                        password: String::new(),
+                    };
+                    true
+                },
+                _ => unreachable!("{:?}", msg),
             }
         }
     }
@@ -35,9 +70,24 @@ impl Component<Context> for Model {
 
 impl Renderable<Context, Model> for Model {
     fn view(&self) -> Html<Context, Self> {
-        html! {
-            // Render your model here
-            <button onclick=|_| Msg::DoIt,>{ self.n.to_string() }</button>
+        match *self {
+            Model::Login { ref email, ref password } => html! {
+                <p>
+                <input
+                    name="email",
+                    value = email,
+                    oninput=|e: InputData| Msg::Login(LoginMsg::Email(e.value)),/>
+                <input
+                    name="password",
+                    type="password",
+                    value=password,
+                    oninput=|e: InputData| Msg::Login(LoginMsg::Password(e.value)), />
+                <button onclick=|_| Msg::Login(LoginMsg::Login),>{ "Login" }</button>
+                </p>
+            },
+            Model::LoggedIn => html! {
+                <button onclick=|_| Msg::Logout,>{ "Logout" }</button>
+            }
         }
     }
 }
