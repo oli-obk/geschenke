@@ -30,10 +30,29 @@ CREATE DATABASE geschenke;
 exit
 ```
 
+## Frontend
+
+```bash
+cargo install cargo-web
+rustup target add asmjs-unknown-emscripten
+```
+
 # Testing
+
+## Backend
+
+getting the database setup
 
 ```bash
 diesel migration run
+```
+
+## Frontend
+
+running
+
+```bash
+cargo web start
 ```
 
 # Useful things
