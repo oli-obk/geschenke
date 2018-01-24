@@ -12,7 +12,7 @@ before_install:
   - cargo install cargo-web
   - rustup target add asmjs-unknown-emscripten
   - cargo install diesel_cli --no-default-features --features postgres
-  - diesel migration run
+  #- diesel migration run
 script:
   cargo build
   cd frontend && cargo web build
