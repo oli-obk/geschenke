@@ -1,11 +1,16 @@
 language: rust
 rust:
-- nightly-2018-01-13
+- nightly-2018-01-20
 before_install:
+  - rustup component add rls-preview
+  - rustup component add rust-src
+  - rustup component add rust-analysis
   - sudo apt-get -qq update
   - sudo apt-get install -y libpq-dev postgresql-9.6
   - cargo install cargo-web
   - rustup target add asmjs-unknown-emscripten
+  - cargo install diesel_cli --no-default-features --features postgres
+  - diesel migration run
 script:
   cargo build
   cd frontend && cargo web build
