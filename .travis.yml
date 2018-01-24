@@ -14,8 +14,8 @@ before_install:
   - cargo install diesel_cli --no-default-features --features postgres
   #- diesel migration run
 script:
-  cargo build
-  cd frontend && cargo web build
+  - cargo build
+  - cd frontend && cargo web build
 notifications:
   email:
     on_success: never
