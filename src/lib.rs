@@ -15,7 +15,7 @@ use rand::distributions::{IndependentSample, Range};
 
 use self::models::NewUser;
 use self::models::NewGeschenk;
-use self::models::Geschenk;
+pub use self::models::Geschenk;
 
 pub type UserId = i32;
 pub type GeschenkId = i32;

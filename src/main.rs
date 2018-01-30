@@ -11,6 +11,8 @@ extern crate rocket_contrib;
 extern crate r2d2_diesel;
 extern crate r2d2;
 extern crate dotenv;
+#[macro_use]
+extern crate horrorshow;
 
 mod api;
 mod pool;
@@ -31,6 +33,9 @@ fn main() {
             api::account::logout,
             api::account::login,
             api::account::login_key,
+        ])
+        .mount("/geschenk", routes![
+            api::geschenk::edit,
         ])
         .manage(pool::establish_connection())
         .launch();
