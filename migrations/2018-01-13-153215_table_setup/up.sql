@@ -34,7 +34,9 @@ COMMENT ON COLUMN geschenke.gifted_date IS 'the date the present has been given 
 
 CREATE TABLE friends (
     id INTEGER NOT NULL REFERENCES users(id) ON UPDATE RESTRICT ON DELETE CASCADE,
-    friend INTEGER NOT NULL REFERENCES users(id) ON UPDATE RESTRICT ON DELETE CASCADE
+    friend INTEGER NOT NULL REFERENCES users(id) ON UPDATE RESTRICT ON DELETE CASCADE,
+    CONSTRAINT no_dups UNIQUE (id, friend),
+    CONSTRAINT no_self_hugging CHECK (id <> friend)
 );
 
 insert into users (name, email, autologin) values ('oliver', 'oli@v.er', 'bar');

@@ -25,19 +25,35 @@ pub fn add_friend(conn: DbConn, user: UserId, new_friend: Form<AddUser>) -> Quer
         .get_result::<::geschenke::UserId>(&*conn)
         .optional()?;
     if let Some(friend) = friend_info {
-        insert_into(friends::table)
-            .values(&NewFriend {
-                friend,
-                id: user.0,
-            })
-            .execute(&*conn)?;
-        // also add the other direction of friendship
-        insert_into(friends::table)
-            .values(&NewFriend {
-                friend: user.0,
-                id: friend,
-            })
-            .execute(&*conn)?;
+        enum Info {
+            SelfHugging,
+            Already,
+            Ok,
+        }
+        let try = |a, b| {
+            let result = insert_into(friends::table)
+                .values(&NewFriend {
+                    friend: a,
+                    id: b,
+                })
+                .execute(&*conn);
+            use diesel::result::{Error, DatabaseErrorKind};
+            match result {
+                Err(Error::DatabaseError(DatabaseErrorKind::UniqueViolation, _)) => Ok(Info::Already),
+                Err(Error::DatabaseError(DatabaseErrorKind::__Unknown, ref info)) if info.constraint_name() == Some("no_self_hugging") => Ok(Info::SelfHugging),
+                Ok(_) => Ok(Info::Ok),
+                Err(other) => Err(other),
+            }
+        };
+        // we already have this friend
+        match try(friend, user.0)? {
+            Info::Ok => {},
+            Info::Already => return Ok(Flash::error(Redirect::to("/"), "You are already friends")),
+            Info::SelfHugging => return Ok(Flash::error(Redirect::to("/"), "You cannot befriend yourself")),
+        }
+        // if we didn't have the friend, we do have them now
+        // try adding the reverse frienship, but ignore if already exists
+        try(user.0, friend)?;
         Ok(Flash::error(Redirect::to("/"), "Added new friend"))
     } else {
         Ok(Flash::error(Redirect::to("/"), "Could not add unregistered friend"))
