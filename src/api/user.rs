@@ -4,6 +4,12 @@ use rocket::request::Form;
 use geschenke::schema::{users, friends};
 use diesel::prelude::*;
 use diesel::{delete, insert_into};
+use geschenke::models::User;
+use geschenke::show_presents_for_user;
+use horrorshow::prelude::*;
+use horrorshow::helper::doctype;
+use rocket::response::Content;
+use rocket::http::ContentType;
 use geschenke::models::NewFriend;
 use super::UserId;
 
@@ -70,4 +76,37 @@ pub fn remove_friend(conn: DbConn, user: UserId, delete_friend: Form<RemoveUser>
     } else {
         Ok(Flash::error(Redirect::to("/"), "Could not delete friend"))
     }
+}
+
+#[get("/<user>")]
+pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<Content<String>> {
+    let info = users::table
+        .filter(users::id.eq(user))
+        .get_result::<User>(&*conn)?;
+    let geschenke = show_presents_for_user(&*conn, me.0, user)?;
+    let page = html!(
+        : doctype::HTML;
+        html {
+            head {
+                title : &info.name;
+            }
+            body {
+                h1 { : info.name }
+                table {
+                    tr {
+                        td { : "Description" }
+                    }
+                    @for geschenk in geschenke {
+                        tr {
+                            td { : geschenk.description }
+                            td {
+                                a(href = format!("/geschenk/edit/{}", geschenk.id)) { : "Edit" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ).into_string().unwrap();
+    Ok(Content(ContentType::HTML, page))
 }

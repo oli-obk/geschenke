@@ -43,6 +43,7 @@ fn main() {
         .mount("/user", routes![
             api::user::add_friend,
             api::user::remove_friend,
+            api::user::view,
         ])
         .catch(errors![
             not_found,

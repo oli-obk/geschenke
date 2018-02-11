@@ -44,9 +44,6 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
                         td {
                             : "Description"
                         }
-                        td {
-                            : "Edit"
-                        }
                     }
                     @ for geschenk in geschenke {
                         tr {
