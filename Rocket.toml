@@ -1,0 +1,8 @@
+[development]
+secret_key = "iIf9CXoTwg2E9Y+8jFhHgQkzfTOvec7+rQbeduW/SXg="
+
+[staging]
+secret_key = "iIf9CXoTwg2E9Y+8jFhHgQkzfTOvec7+rQbeduW/SXg="
+
+[production]
+# create a secret key for production (not in git out of obvious reasons)

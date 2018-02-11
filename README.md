@@ -30,12 +30,15 @@ CREATE DATABASE geschenke;
 exit
 ```
 
-## Frontend
+## cookie secret key
+
+generate a new one with
 
 ```bash
-cargo install cargo-web
-rustup target add asmjs-unknown-emscripten
+openssl rand -base64 32
 ```
+
+and add it to `Rocket.toml` where appropriate
 
 # Testing
 
@@ -45,14 +48,6 @@ getting the database setup
 
 ```bash
 diesel migration run
-```
-
-## Frontend
-
-running
-
-```bash
-cargo web start
 ```
 
 # Useful things
