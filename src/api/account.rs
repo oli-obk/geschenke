@@ -3,7 +3,7 @@ use rocket::http::{Cookies, Cookie};
 use rocket::response::{Flash, Redirect};
 use rocket::request::Form;
 use geschenke::{login_with_password, login_with_key};
-use diesel::QueryResult;
+use diesel::prelude::*;
 
 /// Remove the `user_id` cookie.
 #[post("/logout")]

@@ -4,15 +4,22 @@ use horrorshow::prelude::*;
 use horrorshow::helper::doctype;
 use geschenke::models::User;
 use geschenke::schema::users;
-use diesel::{QueryResult, RunQueryDsl, QueryDsl, ExpressionMethods};
+use geschenke::schema::friends;
+use diesel::prelude::*;
 use pool::DbConn;
+use rocket::request::FlashMessage;
 
 use super::UserId;
 
-pub fn hello_user(conn: DbConn, id: UserId) -> QueryResult<String> {
+pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> QueryResult<String> {
     let user_info = users::table
         .filter(users::id.eq(id.0))
         .get_result::<User>(&*conn)?;
+    let friends = users::table
+        .inner_join(friends::table.on(friends::friend.eq(users::id)))
+        .filter(friends::id.eq(id.0))
+        .select((users::name, users::id))
+        .load::<(String, ::geschenke::UserId)>(&*conn)?;
     // presents I created for myself
     let geschenke = show_presents_for_user(&*conn, id.0, id.0)?;
     Ok(html!(
@@ -26,6 +33,11 @@ pub fn hello_user(conn: DbConn, id: UserId) -> QueryResult<String> {
                     button { : "Logout" }
                 }
                 br;
+                @if let Some(flash) = flash {
+                    span (style = flash.name()) {: flash.msg() }
+                    br;
+                }
+                h1 { : "Presents" }
                 table {
                     tr {
                         td {
@@ -45,6 +57,26 @@ pub fn hello_user(conn: DbConn, id: UserId) -> QueryResult<String> {
                             }
                         }
                     }
+                }
+                h1 { :"Friends" }
+                table {
+                    @for (friend, id) in friends {
+                        tr {
+                            td {
+                                : friend
+                            }
+                            td {
+                                form(action="user/friend/remove", method="post") {
+                                    input (name = "id", value = id, type = "hidden");
+                                    button { : "Delete" }
+                                }
+                            }
+                        }
+                    }
+                }
+                form(action="user/friend/add", method="post") {
+                    input (name = "email") {}
+                    button { : "Add friend via email address" }
                 }
             }
         }

@@ -18,7 +18,7 @@ CREATE TABLE geschenke (
     short_description VARCHAR NOT NULL,
     description TEXT,
     creator INTEGER REFERENCES users(id) ON UPDATE RESTRICT ON DELETE SET NULL,
-    receiver INTEGER NOT NULL REFERENCES users(id) ON UPDATE RESTRICT ON DELETE SET NULL,
+    receiver INTEGER NOT NULL REFERENCES users(id) ON UPDATE RESTRICT ON DELETE CASCADE,
     gifter INTEGER REFERENCES users(id) ON UPDATE RESTRICT ON DELETE SET NULL,
     obtained_date timestamp,
     gifted_date timestamp
@@ -32,8 +32,14 @@ COMMENT ON COLUMN geschenke.gifter IS 'null or whomever wants to give this prese
 COMMENT ON COLUMN geschenke.obtained_date IS 'the date the present has been obtained (bought, made, ...)';
 COMMENT ON COLUMN geschenke.gifted_date IS 'the date the present has been given to the recipient';
 
+CREATE TABLE friends (
+    id INTEGER NOT NULL REFERENCES users(id) ON UPDATE RESTRICT ON DELETE CASCADE,
+    friend INTEGER NOT NULL REFERENCES users(id) ON UPDATE RESTRICT ON DELETE CASCADE
+);
+
 insert into users (name, email, autologin) values ('oliver', 'oli@v.er', 'bar');
 insert into users (name, email, autologin) values ('clara', 'cla@r.a', 'foo');
 
 insert into geschenke (short_description, description, creator, receiver) values ('Foo', 'Ein tolles Foo', 1, 1);
 insert into geschenke (short_description, description, creator, receiver) values ('Bar', 'Viele tolle Bars', 1, 2);
+insert into friends (id, friend) values (1, 2)

@@ -5,13 +5,14 @@ use horrorshow::helper::doctype;
 use pool::DbConn;
 use diesel::QueryResult;
 use rocket::outcome::IntoOutcome;
-use rocket::request::{self, Request, FromRequest};
+use rocket::request::{self, Request, FromRequest, FlashMessage};
 
 pub mod debugging;
 pub mod registration;
 pub mod account;
 pub mod logged_in;
 pub mod geschenk;
+pub mod user;
 
 pub struct UserId(::geschenke::UserId);
 
@@ -28,9 +29,9 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserId {
 }
 
 #[get("/")]
-fn hello(conn: DbConn, user: Option<UserId>) -> QueryResult<Content<String>> {
+fn hello(conn: DbConn, user: Option<UserId>, flash: Option<FlashMessage>) -> QueryResult<Content<String>> {
     let page = if let Some(user) = user {
-        logged_in::hello_user(conn, user)?
+        logged_in::hello_user(conn, user, flash)?
     } else {
         hello_generic()
     };

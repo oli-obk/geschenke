@@ -22,7 +22,15 @@ table! {
     }
 }
 
+table! {
+    friends (id) {
+        id -> Int4,
+        friend -> Int4,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     geschenke,
     users,
+    friends,
 );
