@@ -61,7 +61,7 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
                     @for (friend, id) in friends {
                         tr {
                             td {
-                                : friend
+                                a (href = format!("user/{}", id)) { : friend }
                             }
                             td {
                                 form(action="user/friend/remove", method="post") {
