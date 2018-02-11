@@ -29,6 +29,7 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
                 title : format!("Hello {}!", user_info.name);
             }
             body {
+                h1 { : format!("Hello {}!", user_info.name) }
                 form(action="account/logout", method="post") {
                     button { : "Logout" }
                 }
@@ -37,7 +38,7 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
                     span (style = flash.name()) {: flash.msg() }
                     br;
                 }
-                h1 { : "Presents" }
+                h2 { : "Presents" }
                 table {
                     tr {
                         td {
@@ -58,7 +59,7 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
                         }
                     }
                 }
-                h1 { :"Friends" }
+                h2 { :"Friends" }
                 table {
                     @for (friend, id) in friends {
                         tr {
