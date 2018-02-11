@@ -39,22 +39,29 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
                     br;
                 }
                 h2 { : "Presents" }
-                table {
-                    tr {
-                        td {
-                            : "Description"
-                        }
-                    }
-                    @ for geschenk in geschenke {
+                // make this reusable in /user/id
+                @if !geschenke.is_empty() {
+                    table {
                         tr {
                             td {
-                                : geschenk.short_description
+                                : "Description"
                             }
-                            td {
-                                a(href = format!("geschenk/edit/{}", geschenk.id)) { : "Edit" }
+                        }
+                        @ for geschenk in geschenke {
+                            tr {
+                                td {
+                                    : geschenk.short_description
+                                }
+                                td {
+                                    a(href = format!("geschenk/edit/{}", geschenk.id)) { : "Edit" }
+                                }
                             }
                         }
                     }
+                }
+                form(action="geschenk/add", method="post") {
+                    input (name = "description", placeholder = "short description");
+                    button { : "Create new present" }
                 }
                 h2 { :"Friends" }
                 table {
@@ -73,8 +80,8 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
                     }
                 }
                 form(action="user/friend/add", method="post") {
-                    input (name = "email") {}
-                    button { : "Add friend via email address" }
+                    input (name = "email", placeholder = "email address") {}
+                    button { : "Add friend" }
                 }
             }
         }
