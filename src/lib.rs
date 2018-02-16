@@ -14,7 +14,7 @@ use diesel::pg::PgConnection;
 use rand::distributions::{IndependentSample, Range};
 
 use self::models::NewUser;
-use self::models::NewGeschenk;
+pub use self::models::NewGeschenk;
 pub use self::models::Geschenk;
 
 pub type UserId = i32;
@@ -92,22 +92,6 @@ pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<
         .returning(users::id)
         .get_result::<UserId>(conn)
         .map(|id| (id, autologin))
-}
-
-pub fn add_present(conn: &PgConnection, creator: UserId, recipient: UserId, short_description: &str, description: &str) -> QueryResult<GeschenkId> {
-    use schema::geschenke;
-
-    let new_geschenk = NewGeschenk {
-        creator: Some(creator),
-        receiver: recipient,
-        short_description,
-        description,
-    };
-
-    diesel::insert_into(geschenke::table)
-        .values(&new_geschenk)
-        .returning(geschenke::id)
-        .get_result::<GeschenkId>(conn)
 }
 
 pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Geschenk>> {

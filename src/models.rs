@@ -43,7 +43,6 @@ pub struct Geschenk {
 #[table_name="geschenke"]
 pub struct NewGeschenk<'a> {
     pub short_description: &'a str,
-    pub description: &'a str,
     pub creator: Option<UserId>,
     pub receiver: UserId,
 }

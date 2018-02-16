@@ -38,7 +38,7 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
                     span (style = flash.name()) {: flash.msg() }
                     br;
                 }
-                h2 { : "Presents" }
+                h2 { : "Your wishlist" }
                 // make this reusable in /user/id
                 @if !geschenke.is_empty() {
                     table {
@@ -58,10 +58,6 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
                             }
                         }
                     }
-                }
-                form(action="geschenk/add", method="post") {
-                    input (name = "description", placeholder = "short description");
-                    button { : "Create new present" }
                 }
                 h2 { :"Friends" }
                 table {

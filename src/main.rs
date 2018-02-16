@@ -39,6 +39,7 @@ fn main() {
         .mount("/geschenk", routes![
             api::geschenk::edit,
             api::geschenk::view,
+            api::geschenk::add,
         ])
         .mount("/user", routes![
             api::user::add_friend,

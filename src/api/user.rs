@@ -106,12 +106,16 @@ pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<
                     }
                     @for geschenk in geschenke {
                         tr {
-                            td { : geschenk.description }
+                            td { : geschenk.short_description }
                             td {
                                 a(href = format!("/geschenk/edit/{}", geschenk.id)) { : "Edit" }
                             }
                         }
                     }
+                }
+                form(action=format!("/geschenk/add/{}", user), method="post") {
+                    input (name = "short_description", placeholder = "short description");
+                    button { : "Create new present" }
                 }
             }
         }
