@@ -4,7 +4,6 @@ use rocket::request::Form;
 use geschenke::schema::{users, friends};
 use diesel::prelude::*;
 use diesel::{delete, insert_into};
-use geschenke::models::User;
 use geschenke::show_presents_for_user;
 use horrorshow::prelude::*;
 use horrorshow::helper::doctype;
@@ -80,18 +79,27 @@ pub fn remove_friend(conn: DbConn, user: UserId, delete_friend: Form<RemoveUser>
 
 #[get("/<user>")]
 pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<Content<String>> {
-    let info = users::table
-        .filter(users::id.eq(user))
-        .get_result::<User>(&*conn)?;
+    let username = if me.0 == user {
+        users::table
+            .filter(users::id.eq(user))
+            .select(users::name)
+            .get_result::<String>(&*conn)?
+    } else {
+        users::table
+            .filter(users::id.eq(user))
+            .inner_join(friends::table.on(friends::id.eq(me.0).and(friends::friend.eq(user))))
+            .select(users::name)
+            .get_result::<String>(&*conn)?
+    };
     let geschenke = show_presents_for_user(&*conn, me.0, user)?;
     let page = html!(
         : doctype::HTML;
         html {
             head {
-                title : &info.name;
+                title : &username;
             }
             body {
-                h1 { : info.name }
+                h1 { : username }
                 table {
                     tr {
                         td { : "Description" }
