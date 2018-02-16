@@ -111,7 +111,7 @@ pub fn add_present(conn: &PgConnection, creator: UserId, recipient: UserId, shor
 }
 
 pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Geschenk>> {
-    use schema::geschenke;
+    use schema::{geschenke, friends};
 
     let query = geschenke::table
         .filter(geschenke::receiver.eq(recipient));
@@ -121,8 +121,49 @@ pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: Us
         query.filter(geschenke::creator.eq(viewer))
             .load::<Geschenk>(&*conn)
     } else {
-        query.load::<Geschenk>(&*conn)
+        let is_friend = friends::friend.eq(recipient);
+        let viewer_friends = friends::id.eq(viewer).and(is_friend);
+
+        geschenke::table
+            .inner_join(friends::table.on(viewer_friends))
+            .select((
+                // TODO: find a better way to build this select
+                geschenke::id,
+                geschenke::short_description,
+                geschenke::description,
+                geschenke::creator,
+                geschenke::receiver,
+                geschenke::gifter,
+                geschenke::obtained_date,
+                geschenke::gifted_date,
+            ))
+            .load::<Geschenk>(&*conn)
     }
+}
+
+pub fn get_present(conn: &PgConnection, viewer: UserId, geschenk: GeschenkId) -> QueryResult<Geschenk> {
+    use schema::{geschenke, friends};
+
+    let check_id = geschenke::id.eq(geschenk);
+    let created_by_viewer = geschenke::creator.eq(viewer);
+    let is_friend = friends::friend.eq(geschenke::receiver);
+    let viewer_friends = friends::id.eq(viewer).and(is_friend);
+
+    geschenke::table
+        .inner_join(friends::table.on(viewer_friends.or(created_by_viewer)))
+        .filter(check_id)
+        .select((
+            // TODO: find a better way to build this select
+            geschenke::id,
+            geschenke::short_description,
+            geschenke::description,
+            geschenke::creator,
+            geschenke::receiver,
+            geschenke::gifter,
+            geschenke::obtained_date,
+            geschenke::gifted_date,
+        ))
+        .get_result::<Geschenk>(&*conn)
 }
 
 // password recovery

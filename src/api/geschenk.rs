@@ -6,7 +6,7 @@ use geschenke::schema::{geschenke, users};
 use pool::DbConn;
 use diesel::prelude::*;
 use diesel::update;
-use geschenke::{GeschenkId, Geschenk};
+use geschenke::GeschenkId;
 use rocket::request::Form;
 use super::UserId;
 
@@ -29,9 +29,7 @@ fn edit(conn: DbConn, user: UserId, id: GeschenkId, data: Form<Edit>) -> QueryRe
 
 #[get("/edit/<id>")]
 fn view(conn: DbConn, user: UserId, id: GeschenkId) -> QueryResult<Content<String>> {
-    let geschenk = geschenke::table
-        .filter(geschenke::id.eq(id))
-        .get_result::<Geschenk>(&*conn)?;
+    let geschenk = ::geschenke::get_present(&*conn, user.0, id)?;
     let receiver_name = if geschenk.receiver == user.0 {
         "You".to_string()
     } else {
@@ -40,9 +38,6 @@ fn view(conn: DbConn, user: UserId, id: GeschenkId) -> QueryResult<Content<Strin
             .select(users::name)
             .get_result::<String>(&*conn)?
     };
-    /*if geschenk.creator != Some(user.0) {
-        return ;
-    }*/
     let page = html!(
         : doctype::HTML;
         html {

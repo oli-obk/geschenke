@@ -45,3 +45,4 @@ insert into users (name, email, autologin) values ('clara', 'cla@r.a', 'foo');
 insert into geschenke (short_description, description, creator, receiver) values ('Foo', 'Ein tolles Foo', 1, 1);
 insert into geschenke (short_description, description, creator, receiver) values ('Bar', 'Viele tolle Bars', 1, 2);
 insert into friends (id, friend) values (1, 2)
+insert into friends (id, friend) values (2, 1)

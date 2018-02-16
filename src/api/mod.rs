@@ -14,6 +14,7 @@ pub mod logged_in;
 pub mod geschenk;
 pub mod user;
 
+/// Automatically obtains a user id from cookies
 pub struct UserId(::geschenke::UserId);
 
 impl<'a, 'r> FromRequest<'a, 'r> for UserId {
