@@ -15,8 +15,7 @@ struct Edit {
     description: String,
 }
 
-// FIXME: don't allow editing or viewing presents for anyone but your friends
-// FIXME: generalize viewing rules so you can never view presents meant for you
+// FIXME: don't allow editing presents for anyone but your friends
 
 #[post("/edit/<id>", data = "<data>")]
 fn edit(conn: DbConn, user: UserId, id: GeschenkId, data: Form<Edit>) -> QueryResult<Content<String>> {
