@@ -41,8 +41,12 @@ CREATE TABLE friends (
 
 insert into users (name, email, autologin) values ('oliver', 'oli@v.er', 'bar');
 insert into users (name, email, autologin) values ('clara', 'cla@r.a', 'foo');
+insert into users (name, email, autologin) values ('test', 'test', 'test');
 
-insert into geschenke (short_description, description, creator, receiver) values ('Foo', 'Ein tolles Foo', 1, 1);
-insert into geschenke (short_description, description, creator, receiver) values ('Bar', 'Viele tolle Bars', 1, 2);
-insert into friends (id, friend) values (1, 2)
-insert into friends (id, friend) values (2, 1)
+insert into geschenke (short_description, description, creator, receiver) values ('Foo', 'von oliver erstellt', 1, 1);
+insert into geschenke (short_description, description, creator, receiver) values ('Bar', 'von oliver für clara', 1, 2);
+insert into geschenke (short_description, description, creator, receiver) values ('Boo', 'von clara für oliver', 2, 1);
+
+insert into friends (id, friend) values (1, 2);
+insert into friends (id, friend) values (2, 1);
+insert into friends (id, friend) values (3, 1);
