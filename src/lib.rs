@@ -122,7 +122,7 @@ pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: Us
             .load::<Geschenk>(&*conn)
     } else {
         let is_friend = friends::friend.eq(recipient);
-        let viewer_friends = friends::id.eq(viewer).and(is_friend);
+        let viewer_friends = friends::id.eq(viewer).and(is_friend).and(geschenke::receiver.ne(viewer));
 
         geschenke::table
             .inner_join(friends::table.on(viewer_friends))
