@@ -6,6 +6,8 @@ extern crate diesel;
 extern crate chrono;
 extern crate sha3;
 extern crate rand;
+extern crate mailstrom;
+extern crate email_format;
 #[macro_use] extern crate serde_derive;
 
 use diesel::prelude::*;
@@ -72,7 +74,7 @@ pub fn set_pw(conn: &PgConnection, user: UserId, pw: String) -> QueryResult<()> 
     unimplemented!()
 }
 
-pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<(UserId, AutologinKey)> {
+pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<UserId> {
     use schema::users;
 
     let mut autologin = String::new();
@@ -83,6 +85,8 @@ pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<
         autologin.push(c as char)
     }
 
+    // send email
+
     diesel::insert_into(users::table)
         .values(&NewUser {
             name,
@@ -91,7 +95,6 @@ pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<
         })
         .returning(users::id)
         .get_result::<UserId>(conn)
-        .map(|id| (id, autologin))
 }
 
 pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Geschenk>> {
