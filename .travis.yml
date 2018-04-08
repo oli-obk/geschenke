@@ -4,6 +4,14 @@ rust:
 # remember to clear travis caches when updating the nightly version
 - nightly-2018-04-07
 before_install:
+  - wget https://www.openssl.org/source/openssl-1.1.0h.tar.gz
+  - tar -xf openssl-1.1.0h.tar.gz
+  - cd openssl-1.1.0h
+  - ./Configure linux-x86_64 -fPIC
+  - make j4 &>/dev/null
+  - make install &>/dev/null
+  - cd ..
+  - rm -rf openssl-*
   - rustup component add rls-preview
   - rustup component add rust-src
   - rustup component add rust-analysis
