@@ -28,7 +28,6 @@ fn main() {
             api::debugging::user_info,
         ])
         .mount("/registration", routes![
-            api::registration::create_user,
             api::registration::create_user_form,
         ])
         .mount("/account", routes![

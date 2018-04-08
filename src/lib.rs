@@ -13,6 +13,8 @@ extern crate email_format;
 use diesel::prelude::*;
 use diesel::result::Error as DieselError;
 use diesel::pg::PgConnection;
+use chrono::prelude::*;
+
 use rand::distributions::{IndependentSample, Range};
 
 use self::models::NewUser;
@@ -74,7 +76,29 @@ pub fn set_pw(conn: &PgConnection, user: UserId, pw: String) -> QueryResult<()> 
     unimplemented!()
 }
 
-pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<UserId> {
+#[derive(Debug, PartialEq)]
+pub enum UserCreationError {
+    /// There's already an entry with that email in the database
+    EmailAlreadyExists,
+    /// Multiple `@` or contains spaces
+    InvalidEmailAddress,
+    /// Server failure, probably because of blacklisted ips
+    CouldNotSendMail,
+    /// Generic diesel error
+    Diesel(::diesel::result::Error),
+}
+
+impl From<::diesel::result::Error> for UserCreationError {
+    fn from(other: ::diesel::result::Error) -> Self {
+        UserCreationError::Diesel(other)
+    }
+}
+
+pub fn create_user(conn: &PgConnection, name: &str, email_address: &str) -> Result<UserId, UserCreationError> {
+    let email_address = email_address.trim();
+    if email_address.chars().any(|c| c.is_whitespace()) || email_address.chars().filter(|&c| c == '@').count() != 1 {
+        return Err(UserCreationError::InvalidEmailAddress);
+    }
     use schema::users;
 
     let mut autologin = String::new();
@@ -85,16 +109,70 @@ pub fn create_user(conn: &PgConnection, name: &str, email: &str) -> QueryResult<
         autologin.push(c as char)
     }
 
-    // send email
+    use email_format::Email;
+    use mailstrom::{Mailstrom, Config, MemoryStorage};
+    let now: DateTime<Utc> = Utc::now();
+    let mut email = Email::new(
+        "geschenke@oli-obk.de",  // "From:"
+        &now, // "Date:"
+    ).unwrap();
 
-    diesel::insert_into(users::table)
+    email.set_bcc("geschenke@oli-obk.de").unwrap();
+    email.set_sender("geschenke@oli-obk.de").unwrap();
+    email.set_to(email_address).unwrap();
+    email.set_subject("Geschenke App Registration").unwrap();
+    let body = format!(
+        "Someone (probably you) has created an account for this email address at https://geschenke.oli-obk.de .\r\n\
+        If it was not you, visit https://geschenke.oli-obk.de/nuke/{}/{}.\r\n\
+        \r\n\
+        Click the following link to login: https://geschnek.oli-obk.de/login/{} \r\n\
+        \r\n\
+        Your friendly neighborhood Geschenke-Bot",
+        email_address,
+        autologin,
+        autologin,
+    );
+    println!("{:?}", body);
+    email.set_body(&*body).unwrap();
+
+    let mut mailstrom = Mailstrom::new(
+        Config {
+            helo_name: "geschenke.oli-obk.de".to_owned(),
+            smtp_timeout_secs: 30,
+            ..Default::default()
+        },
+        MemoryStorage::new());
+
+    // We must explicitly tell mailstrom to start actually sending emails.  If we
+    // were only interested in reading the status of previously sent emails, we
+    // would not send this command.
+    mailstrom.start().unwrap();
+
+    let message_id = mailstrom.send_email(email).unwrap();
+
+    // Later on, after the worker thread has had time to process the request,
+    // you can check the status:
+
+    loop {
+        let status = mailstrom.query_status(&*message_id).unwrap();
+        println!("{:?}", status);
+        if status.completed() {
+            if !status.succeeded() {
+                return Err(UserCreationError::CouldNotSendMail);
+            }
+            break;
+        }
+    }
+
+    let id = diesel::insert_into(users::table)
         .values(&NewUser {
             name,
-            email,
+            email: email_address,
             autologin: &autologin,
         })
         .returning(users::id)
-        .get_result::<UserId>(conn)
+        .get_result::<UserId>(conn)?;
+    Ok(id)
 }
 
 pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Geschenk>> {
