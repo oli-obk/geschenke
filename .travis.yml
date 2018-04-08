@@ -13,7 +13,7 @@ before_install:
   - diesel help || cargo install diesel_cli --no-default-features --features postgres -f
   #- diesel migration run
 script:
-  - cargo build
+  - cargo build --locked
 notifications:
   email:
     on_success: never
