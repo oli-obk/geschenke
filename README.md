@@ -6,7 +6,7 @@
 Not necessary if you use the rls extension from vscode
 
 ```bash
-rustup override set nightly-2018-01-20
+rustup override set nightly-2018-04-07
 rustup component add rls-preview
 rustup component add rust-src
 rustup component add rust-analysis
