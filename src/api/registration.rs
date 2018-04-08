@@ -17,6 +17,7 @@ fn create_user_form(conn: DbConn, user: Form<User>) -> QueryResult<Flash<Redirec
         Ok(_) => Ok(Flash::success(Redirect::to("/"), "An email with your password has been sent to you")),
         Err(UserCreationError::EmailAlreadyExists) => Ok(Flash::error(Redirect::to("/"), "This email is already registered")),
         Err(UserCreationError::InvalidEmailAddress) => Ok(Flash::error(Redirect::to("/"), "That's not an email address")),
+        Err(UserCreationError::CouldNotSendMail) => Ok(Flash::error(Redirect::to("/"), "Please contact an admin, emails could not be sent")),
         Err(UserCreationError::Diesel(diesel)) => Err(diesel),
     }
 }
