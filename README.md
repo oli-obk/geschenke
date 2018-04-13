@@ -30,6 +30,26 @@ CREATE DATABASE geschenke;
 exit
 ```
 
+## https
+
+```bash
+apt install certbot -t stretch-backports
+# make sure no http server is running
+certbot certonly
+# choose "standalone"
+# fill out rest of stuff
+```
+
+Add
+
+```
+[global.tls]
+certs = "/path/to/certs.pem"
+key = "/path/to/key.pem"
+```
+
+to `Rocket.toml`
+
 ## cookie secret key
 
 generate a new one with

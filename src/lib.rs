@@ -117,15 +117,17 @@ pub fn create_user(conn: &PgConnection, name: &str, email_address: &str) -> Resu
         &now, // "Date:"
     ).unwrap();
 
-    email.set_bcc("geschenke@oli-obk.de").unwrap();
     email.set_sender("geschenke@oli-obk.de").unwrap();
     email.set_to(email_address).unwrap();
     email.set_subject("Geschenke App Registration").unwrap();
     let body = format!(
         "Someone (probably you) has created an account for this email address at https://geschenke.oli-obk.de .\r\n\
-        If it was not you, visit https://geschenke.oli-obk.de/nuke/{}/{}.\r\n\
         \r\n\
-        Click the following link to login: https://geschnek.oli-obk.de/login/{} \r\n\
+        If it was not you, visit\r\n\
+        https://geschenke.oli-obk.de/nuke/{}/{}.\r\n\
+        \r\n\
+        Click the following link to login:\r\n
+        https://geschenke.oli-obk.de/login/{} \r\n\
         \r\n\
         Your friendly neighborhood Geschenke-Bot",
         email_address,
