@@ -57,7 +57,7 @@ pub fn add_friend(conn: DbConn, user: UserId, new_friend: Form<AddUser>) -> Quer
             Info::SelfHugging => return Ok(Flash::error(Redirect::to("/"), "You cannot befriend yourself")),
         }
         // if we didn't have the friend, we do have them now
-        // try adding the reverse frienship, but ignore if already exists
+        // try adding the reverse friendship, but ignore if already exists
         try(user.0, friend)?;
         Ok(Flash::error(Redirect::to("/"), "Added new friend"))
     } else {
