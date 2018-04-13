@@ -127,7 +127,7 @@ pub fn create_user(conn: &PgConnection, name: &str, email_address: &str) -> Resu
         https://geschenke.oli-obk.de/nuke/{}/{}.\r\n\
         \r\n\
         Click the following link to login:\r\n\
-        https://geschenke.oli-obk.de/login/{} \r\n\
+        https://geschenke.oli-obk.de/account/login_form_key?key={} \r\n\
         \r\n\
         Your friendly neighborhood Geschenke-Bot",
         email_address,

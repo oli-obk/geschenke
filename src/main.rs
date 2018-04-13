@@ -55,10 +55,10 @@ fn main() {
 
 #[error(404)]
 fn not_found(req: &Request) -> String {
-    format!("{:#?}", req)
+    format!("404:<br/>\n{:#?}", req)
 }
 
 #[error(422)]
 fn bad_parse(req: &Request) -> String {
-    format!("{:#?}", req)
+    format!("422:<br/>\n{:#?}", req)
 }
