@@ -157,9 +157,9 @@ pub fn create_user(conn: &PgConnection, name: &str, email_address: &str) -> Resu
 
     loop {
         let status = mailstrom.query_status(&*message_id).unwrap();
-        println!("{:?}", status);
         if status.completed() {
             if !status.succeeded() {
+                println!("{:?}", status);
                 return Err(UserCreationError::CouldNotSendMail);
             }
             break;
