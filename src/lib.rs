@@ -180,31 +180,27 @@ pub fn create_user(conn: &PgConnection, name: &str, email_address: &str) -> Resu
 pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Geschenk>> {
     use schema::{geschenke, friends};
 
-    let query = geschenke::table
-        .filter(geschenke::receiver.eq(recipient));
-
     if viewer == recipient {
         // show only the presents that the user created himself
-        query.filter(geschenke::creator.eq(viewer))
+        geschenke::table
+            .filter(geschenke::receiver.eq(recipient)
+                .and(geschenke::creator.eq(viewer)))
             .load::<Geschenk>(&*conn)
     } else {
-        let is_friend = friends::friend.eq(recipient);
-        let viewer_friends = friends::id.eq(viewer).and(is_friend).and(geschenke::receiver.ne(viewer));
+        use schema::{geschenke, friends};
 
-        geschenke::table
-            .inner_join(friends::table.on(viewer_friends))
-            .select((
-                // TODO: find a better way to build this select
-                geschenke::id,
-                geschenke::short_description,
-                geschenke::description,
-                geschenke::creator,
-                geschenke::receiver,
-                geschenke::gifter,
-                geschenke::obtained_date,
-                geschenke::gifted_date,
-            ))
-            .load::<Geschenk>(&*conn)
+        let n: i64 = friends::table
+            .filter(friends::friend.eq(recipient).and(friends::id.eq(viewer)))
+            .count()
+            .get_result(&*conn)?;
+        if n == 1 {
+            geschenke::table
+                .filter(geschenke::receiver.eq(recipient))
+                .load::<Geschenk>(&*conn)
+        } else {
+            assert_eq!(n, 0);
+            Err(DieselError::NotFound)
+        }
     }
 }
 
