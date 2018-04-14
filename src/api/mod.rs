@@ -31,12 +31,11 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserId {
 
 #[get("/")]
 fn hello(conn: DbConn, user: Option<UserId>, flash: Option<FlashMessage>) -> QueryResult<Content<String>> {
-    let page = if let Some(user) = user {
-        logged_in::hello_user(conn, user, flash)?
+    if let Some(user) = user {
+        logged_in::hello_user(conn, user, flash)
     } else {
-        hello_generic()
-    };
-    Ok(Content(ContentType::HTML, page))
+        Ok(Content(ContentType::HTML, hello_generic()))
+    }
 }
 
 fn hello_generic() -> String {
@@ -44,24 +43,29 @@ fn hello_generic() -> String {
         : doctype::HTML;
         html {
             head {
-                title : "Hello World!";
+                title : "Geschenkeplanungsapp";
             }
             body {
-                h1 { : "Debugging" }
-                a(href="debugging/geschenke") { : "Database dump of presents" } br;
-                a(href="debugging/users") { : "Database dump of users"} br;
-                a(href="debugging/user_info") { : "info about current user"} br;
-                h1 { : "Login" }
-                form(action="account/login_form", method="post") {
-                    :"Email:"; input(name="email"); br;
-                    :"Password:"; input(type="password", name="password"); br;
-                    button { : "Login" }
+                @if option_env!("ROCKET_ENV").unwrap_or("development") == "development" {
+                    h1 { : "Debugging" }
+                    a(href="debugging/geschenke") { : "Database dump of presents" } br;
+                    a(href="debugging/users") { : "Database dump of users"} br;
+                    a(href="debugging/user_info") { : "info about current user"} br;
                 }
-                h1 { : "Login with key" }
-                form(action="account/login_form_key", method="get") {
-                    :"Key:"; input(name="key"); br;
-                    button { : "Login" }
+                @if option_env!("ROCKET_ENV") != Some("production") {
+                    h1 { : "Login" }
+                    form(action="account/login_form", method="post") {
+                        :"Email:"; input(name="email"); br;
+                        :"Password:"; input(type="password", name="password"); br;
+                        button { : "Login" }
+                    }
+                    h1 { : "Login with key" }
+                    form(action="account/login_form_key", method="get") {
+                        :"Key:"; input(name="key"); br;
+                        button { : "Login" }
+                    }
                 }
+                : "To login click on the login link that is in every email that you get.";
                 h1 { : "Register" }
                 form(action="registration/register_form", method="post") {
                     :"Name:";  input(name="name" ); br;

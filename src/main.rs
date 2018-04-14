@@ -21,13 +21,8 @@ mod pool;
 mod ui;
 
 fn main() {
-    rocket::ignite()
+    let rocket = rocket::ignite()
         .mount("/", routes![api::hello])
-        .mount("/debugging", routes![
-            api::debugging::get_geschenke,
-            api::debugging::get_users,
-            api::debugging::user_info,
-        ])
         .mount("/registration", routes![
             api::registration::create_user_form,
         ])
@@ -50,6 +45,17 @@ fn main() {
             not_found,
             bad_parse,
         ])
+    ;
+    let rocket = if option_env!("ROCKET_ENV").unwrap_or("development") == "development" {
+        rocket.mount("/debugging", routes![
+            api::debugging::get_geschenke,
+            api::debugging::get_users,
+            api::debugging::user_info,
+        ])
+    } else {
+        rocket
+    };
+    rocket
         .manage(pool::establish_connection())
         .launch();
 }

@@ -5,12 +5,10 @@ use geschenke::schema::{users, friends};
 use diesel::prelude::*;
 use diesel::{delete, insert_into};
 use geschenke::show_presents_for_user;
-use horrorshow::prelude::*;
-use horrorshow::helper::doctype;
 use rocket::response::Content;
-use rocket::http::ContentType;
 use geschenke::models::NewFriend;
 use super::UserId;
+use ui;
 
 #[derive(Deserialize, FromForm)]
 pub struct AddUser {
@@ -79,46 +77,34 @@ pub fn remove_friend(conn: DbConn, user: UserId, delete_friend: Form<RemoveUser>
 
 #[get("/<user>")]
 pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<Content<String>> {
-    let username = if me.0 == user {
-        users::table
-            .filter(users::id.eq(user))
-            .select(users::name)
-            .get_result::<String>(&*conn)?
+    let title = if me.0 == user {
+        "Your wishlist".to_owned()
     } else {
-        users::table
+        let name = users::table
             .filter(users::id.eq(user))
             .inner_join(friends::table.on(friends::id.eq(me.0).and(friends::friend.eq(user))))
             .select(users::name)
-            .get_result::<String>(&*conn)?
+            .get_result::<String>(&*conn)?;
+        format!("{}'s wishlist", name)
     };
     let geschenke = show_presents_for_user(&*conn, me.0, user)?;
-    let page = html!(
-        : doctype::HTML;
-        html {
-            head {
-                title : &username;
+    Ok(ui::render(&title, html!(
+        table {
+            tr {
+                td { : "Description" }
             }
-            body {
-                h1 { : username }
-                table {
-                    tr {
-                        td { : "Description" }
+            @for geschenk in geschenke {
+                tr {
+                    td { : geschenk.short_description }
+                    td {
+                        a(href = format!("/geschenk/edit/{}", geschenk.id)) { : "Edit" }
                     }
-                    @for geschenk in geschenke {
-                        tr {
-                            td { : geschenk.short_description }
-                            td {
-                                a(href = format!("/geschenk/edit/{}", geschenk.id)) { : "Edit" }
-                            }
-                        }
-                    }
-                }
-                form(action=format!("/geschenk/add/{}", user), method="post") {
-                    input (name = "short_description", placeholder = "short description");
-                    button { : "Create new present" }
                 }
             }
         }
-    ).into_string().unwrap();
-    Ok(Content(ContentType::HTML, page))
+        form(action=format!("/geschenk/add/{}", user), method="post") {
+            input (name = "short_description", placeholder = "short description");
+            button { : "Create new present" }
+        }
+    )))
 }

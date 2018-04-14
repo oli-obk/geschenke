@@ -1,5 +1,4 @@
 use rocket::response::Content;
-use rocket::http::ContentType;
 use geschenke::schema::{geschenke, users};
 use pool::DbConn;
 use diesel::prelude::*;
@@ -64,7 +63,7 @@ fn render(conn: DbConn, user: UserId, geschenk: Geschenk) -> QueryResult<Content
         description,
         ..
     } = geschenk;
-    let page = ui::render(&short_description, html!(
+    Ok(ui::render(&short_description, html!(
         form(action=format!("/geschenk/edit/{}", id), method="post") {
             :"The present is for ";
             a(href=format!("/user/{}", receiver)) { :receiver_name } br;
@@ -72,6 +71,5 @@ fn render(conn: DbConn, user: UserId, geschenk: Geschenk) -> QueryResult<Content
             input(type="textarea", name="description", value = description); br;
             button { : "Save" }
         }
-    ));
-    Ok(Content(ContentType::HTML, page))
+    )))
 }
