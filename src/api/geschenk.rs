@@ -1,7 +1,5 @@
 use rocket::response::Content;
 use rocket::http::ContentType;
-use horrorshow::prelude::*;
-use horrorshow::helper::doctype;
 use geschenke::schema::{geschenke, users};
 use pool::DbConn;
 use diesel::prelude::*;
@@ -9,6 +7,7 @@ use diesel::{update, insert_into};
 use geschenke::{GeschenkId, Geschenk, NewGeschenk};
 use rocket::request::Form;
 use super::UserId;
+use ui;
 
 #[derive(Deserialize, FromForm)]
 struct Edit {
@@ -58,23 +57,21 @@ fn render(conn: DbConn, user: UserId, geschenk: Geschenk) -> QueryResult<Content
             .select(users::name)
             .get_result::<String>(&*conn)?
     };
-    let page = html!(
-        : doctype::HTML;
-        html {
-            head {
-                title : &geschenk.short_description;
-            }
-            body {
-                h1 { : geschenk.short_description }
-                form(action=format!("/geschenk/edit/{}", geschenk.id), method="post") {
-                    :"The present is for ";
-                    a(href=format!("/user/{}", geschenk.receiver)) { :receiver_name } br;
-                    :"Description:";
-                    input(type="textarea", name="description", value = geschenk.description); br;
-                    button { : "Save" }
-                }
-            }
+    let Geschenk {
+        short_description,
+        id,
+        receiver,
+        description,
+        ..
+    } = geschenk;
+    let page = ui::render(&short_description, html!(
+        form(action=format!("/geschenk/edit/{}", id), method="post") {
+            :"The present is for ";
+            a(href=format!("/user/{}", receiver)) { :receiver_name } br;
+            :"Description:";
+            input(type="textarea", name="description", value = description); br;
+            button { : "Save" }
         }
-    ).into_string().unwrap();
+    ));
     Ok(Content(ContentType::HTML, page))
 }

@@ -18,6 +18,7 @@ use rocket::Request;
 
 mod api;
 mod pool;
+mod ui;
 
 fn main() {
     rocket::ignite()
