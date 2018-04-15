@@ -10,6 +10,7 @@ use geschenke::models::NewFriend;
 use super::UserId;
 use ui;
 use horrorshow::RenderOnce;
+use rocket::request::FlashMessage;
 
 #[derive(Deserialize, FromForm)]
 pub struct AddUser {
@@ -111,7 +112,7 @@ pub fn print_wishlist(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> Qu
 }
 
 #[get("/<user>")]
-pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<Content<String>> {
+pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId, flash: Option<FlashMessage>) -> QueryResult<Content<String>> {
     let (wishlist, title) = print_wishlist(conn, me, user)?;
-    Ok(ui::render(&title, None, wishlist))
+    Ok(ui::render(&title, flash, wishlist))
 }

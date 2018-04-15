@@ -4,7 +4,9 @@ use pool::DbConn;
 use diesel::prelude::*;
 use diesel::{update, insert_into};
 use geschenke::{PresentId, Present, NewPresent};
-use rocket::request::Form;
+use rocket::response::{Flash, Redirect};
+use rocket::request::{Form, FromFormValue};
+use rocket::http::RawStr;
 use super::UserId;
 use ui;
 
@@ -15,20 +17,41 @@ struct Edit {
 
 #[derive(Deserialize, FromForm)]
 struct Add {
-    short_description: String,
+    short_description: ShortDescription,
+}
+
+#[derive(Deserialize)]
+struct ShortDescription(String);
+
+impl<'v> FromFormValue<'v> for ShortDescription {
+    type Error = ();
+
+    fn from_form_value(form_value: &'v RawStr) -> Result<ShortDescription, ()> {
+        let s = form_value.url_decode().map_err(|_| ())?;
+        let s = s.trim();
+        if s.is_empty() {
+            Err(())
+        } else {
+            Ok(ShortDescription(s.to_owned()))
+        }
+    }
 }
 
 #[post("/add/<recipient>", data = "<data>")]
-fn add(conn: DbConn, user: UserId, recipient: ::geschenke::UserId, data: Form<Add>) -> QueryResult<Content<String>> {
-    let new = NewPresent {
-        short_description: &data.get().short_description,
-        creator: Some(user.0),
-        recipient,
-    };
-    let present = insert_into(presents::table)
-        .values(&new)
-        .get_result::<Present>(&*conn)?;
-    render(conn, user, present)
+fn add(conn: DbConn, user: UserId, recipient: ::geschenke::UserId, data: Option<Form<Add>>) -> QueryResult<Flash<Redirect>> {
+    if let Some(data) = data {
+        let new = NewPresent {
+            short_description: &data.get().short_description.0,
+            creator: Some(user.0),
+            recipient,
+        };
+        let present = insert_into(presents::table)
+            .values(&new)
+            .get_result::<Present>(&*conn)?;
+        Ok(Flash::success(Redirect::to(&format!("/present/edit/{}", present.id)), "Added new present"))
+    } else {
+        Ok(Flash::error(Redirect::to(&format!("/user/{}", recipient)), "Cannot add a present without a description"))
+    }
 }
 
 // FIXME: don't allow adding/editing presents for anyone but your friends
