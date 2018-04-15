@@ -70,7 +70,7 @@ fn hello_generic() -> String {
                 form(action="registration/register_form", method="post") {
                     :"Name:";  input(name="name" ); br;
                     :"Email:"; input(name="email"); br;
-                    button { : "Create User" }
+                    button { : "Register" }
                 }
             }
         }
