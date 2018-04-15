@@ -9,6 +9,7 @@ use rocket::response::Content;
 use geschenke::models::NewFriend;
 use super::UserId;
 use ui;
+use horrorshow::RenderOnce;
 
 #[derive(Deserialize, FromForm)]
 pub struct AddUser {
@@ -75,8 +76,7 @@ pub fn remove_friend(conn: DbConn, user: UserId, delete_friend: Form<RemoveUser>
     }
 }
 
-#[get("/<user>")]
-pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<Content<String>> {
+pub fn print_wishlist(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<(impl RenderOnce, String)> {
     let title = if me.0 == user {
         "Your wishlist".to_owned()
     } else {
@@ -88,7 +88,8 @@ pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<
         format!("{}'s wishlist", name)
     };
     let geschenke = show_presents_for_user(&*conn, me.0, user)?;
-    Ok(ui::render(&title, None, html!(
+    let user_url = format!("/geschenk/add/{}", user);
+    Ok((html!(
         table {
             tr {
                 td { : "Description" }
@@ -102,9 +103,15 @@ pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<
                 }
             }
         }
-        form(action=format!("/geschenk/add/{}", user), method="post") {
+        form(action=user_url, method="post") {
             input (name = "short_description", placeholder = "short description");
             button { : "Create new present" }
         }
-    )))
+    ), title))
+}
+
+#[get("/<user>")]
+pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<Content<String>> {
+    let (wishlist, title) = print_wishlist(conn, me, user)?;
+    Ok(ui::render(&title, None, wishlist))
 }

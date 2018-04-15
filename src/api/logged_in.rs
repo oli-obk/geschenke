@@ -1,5 +1,3 @@
-use geschenke::show_presents_for_user;
-
 use geschenke::models::User;
 use geschenke::schema::users;
 use geschenke::schema::friends;
@@ -8,43 +6,26 @@ use pool::DbConn;
 use rocket::request::FlashMessage;
 use ui;
 use rocket::response::Content;
+use api::user::print_wishlist;
 
 use super::UserId;
 
 pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> QueryResult<Content<String>> {
+    let int_id = id.0;
     let user_info = users::table
-        .filter(users::id.eq(id.0))
+        .filter(users::id.eq(int_id))
         .get_result::<User>(&*conn)?;
     let friends = users::table
         .inner_join(friends::table.on(friends::friend.eq(users::id)))
-        .filter(friends::id.eq(id.0))
+        .filter(friends::id.eq(int_id))
         .select((users::name, users::id))
         .load::<(String, ::geschenke::UserId)>(&*conn)?;
-    // presents I created for myself
-    let geschenke = show_presents_for_user(&*conn, id.0, id.0)?;
+    let (wishlist, _) = print_wishlist(conn, id, int_id)?;
     let title = format!("Hello {}!", user_info.name);
     Ok(ui::render(&title, flash, html!(
         h2 { : "Your wishlist" }
         // make this reusable in /user/id
-        @if !geschenke.is_empty() {
-            table {
-                tr {
-                    td {
-                        : "Description"
-                    }
-                }
-                @ for geschenk in geschenke {
-                    tr {
-                        td {
-                            : geschenk.short_description
-                        }
-                        td {
-                            a(href = format!("geschenk/edit/{}", geschenk.id)) { : "Edit" }
-                        }
-                    }
-                }
-            }
-        }
+        : wishlist;
         h2 { :"Friends" }
         table {
             @for (friend, id) in friends {
