@@ -9,7 +9,7 @@ before_install:
   - cd openssl-1.1.0h
   - ./Configure linux-x86_64 -fPIC
   - make -j4 #&>/dev/null
-  - make install #&>/dev/null
+  - sudo make install #&>/dev/null
   - cd ..
   - rm -rf openssl-*
   - rustup component add rls-preview
