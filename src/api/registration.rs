@@ -59,13 +59,15 @@ fn create_user(conn: &PgConnection, mailstrom: State<Mail>, name: &str, email_ad
     let body = format!(
         "Someone (probably you) has created an account for this email address at https://geschenke.oli-obk.de .\r\n\
         \r\n\
-        If it was not you, visit\r\n\
-        https://geschenke.oli-obk.de/nuke/{}/{}.\r\n\
-        \r\n\
         Click the following link to login:\r\n\
         https://geschenke.oli-obk.de/account/login_form_key?key={} \r\n\
         \r\n\
-        Your friendly neighborhood Geschenke-Bot",
+        Your friendly neighborhood Geschenke-Bot\r\n\
+        \r\n\
+        \r\n\
+        If it was not you, visit\r\n\
+        https://geschenke.oli-obk.de/nuke/{}/{}.\r\n\
+        to remove your email address from our database\r\n",
         email_address,
         autologin,
         autologin,
