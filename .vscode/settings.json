@@ -1,3 +1,4 @@
 {
-    "rust-client.channel": "nightly-2018-01-20",
+    "rust-client.channel": "nightly-2018-04-07",
+    "cSpell.enabled": false,
 }
