@@ -11,7 +11,7 @@ pub mod debugging;
 pub mod registration;
 pub mod account;
 pub mod logged_in;
-pub mod geschenk;
+pub mod present;
 pub mod user;
 
 /// Automatically obtains a user id from cookies
@@ -52,7 +52,7 @@ fn hello_generic(flash: Option<FlashMessage>) -> String {
                 }
                 @if option_env!("ROCKET_ENV").unwrap_or("development") == "development" {
                     h1 { : "Debugging" }
-                    a(href="debugging/geschenke") { : "Database dump of presents" } br;
+                    a(href="debugging/presents") { : "Database dump of presents" } br;
                     a(href="debugging/users") { : "Database dump of users"} br;
                     a(href="debugging/user_info") { : "info about current user"} br;
                 }

@@ -12,11 +12,11 @@ use diesel::result::Error as DieselError;
 use diesel::pg::PgConnection;
 
 pub use self::models::NewUser;
-pub use self::models::NewGeschenk;
-pub use self::models::Geschenk;
+pub use self::models::NewPresent;
+pub use self::models::Present;
 
 pub type UserId = i32;
-pub type GeschenkId = i32;
+pub type PresentId = i32;
 pub type AutologinKey = String;
 pub type BorrowedAutologinKey = str;
 
@@ -88,26 +88,26 @@ impl From<::diesel::result::Error> for UserCreationError {
     }
 }
 
-pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Geschenk>> {
-    use schema::geschenke;
+pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Present>> {
+    use schema::presents;
 
     if viewer == recipient {
         // show only the presents that the user created himself
-        geschenke::table
-            .filter(geschenke::recipient.eq(recipient)
-                .and(geschenke::creator.eq(viewer)))
-            .load::<Geschenk>(&*conn)
+        presents::table
+            .filter(presents::recipient.eq(recipient)
+                .and(presents::creator.eq(viewer)))
+            .load::<Present>(&*conn)
     } else {
-        use schema::{geschenke, friends};
+        use schema::{presents, friends};
 
         let n: i64 = friends::table
             .filter(friends::friend.eq(recipient).and(friends::id.eq(viewer)))
             .count()
             .get_result(&*conn)?;
         if n == 1 {
-            geschenke::table
-                .filter(geschenke::recipient.eq(recipient))
-                .load::<Geschenk>(&*conn)
+            presents::table
+                .filter(presents::recipient.eq(recipient))
+                .load::<Present>(&*conn)
         } else {
             assert_eq!(n, 0);
             Err(DieselError::NotFound)
@@ -115,29 +115,29 @@ pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: Us
     }
 }
 
-pub fn get_present(conn: &PgConnection, viewer: UserId, geschenk: GeschenkId) -> QueryResult<Geschenk> {
-    use schema::{geschenke, friends};
+pub fn get_present(conn: &PgConnection, viewer: UserId, present: PresentId) -> QueryResult<Present> {
+    use schema::{presents, friends};
 
-    let check_id = geschenke::id.eq(geschenk);
-    let created_by_viewer = geschenke::creator.eq(viewer);
-    let is_friend = friends::friend.eq(geschenke::recipient);
+    let check_id = presents::id.eq(present);
+    let created_by_viewer = presents::creator.eq(viewer);
+    let is_friend = friends::friend.eq(presents::recipient);
     let viewer_friends = friends::id.eq(viewer).and(is_friend);
 
-    geschenke::table
+    presents::table
         .inner_join(friends::table.on(viewer_friends.or(created_by_viewer)))
         .filter(check_id)
         .select((
             // TODO: find a better way to build this select
-            geschenke::id,
-            geschenke::short_description,
-            geschenke::description,
-            geschenke::creator,
-            geschenke::recipient,
-            geschenke::gifter,
-            geschenke::reserved_date,
-            geschenke::gifted_date,
+            presents::id,
+            presents::short_description,
+            presents::description,
+            presents::creator,
+            presents::recipient,
+            presents::gifter,
+            presents::reserved_date,
+            presents::gifted_date,
         ))
-        .get_result::<Geschenk>(&*conn)
+        .get_result::<Present>(&*conn)
 }
 
 // password recovery

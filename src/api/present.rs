@@ -1,9 +1,9 @@
 use rocket::response::Content;
-use geschenke::schema::{geschenke, users};
+use geschenke::schema::{presents, users};
 use pool::DbConn;
 use diesel::prelude::*;
 use diesel::{update, insert_into};
-use geschenke::{GeschenkId, Geschenk, NewGeschenk};
+use geschenke::{PresentId, Present, NewPresent};
 use rocket::request::Form;
 use super::UserId;
 use ui;
@@ -20,51 +20,51 @@ struct Add {
 
 #[post("/add/<recipient>", data = "<data>")]
 fn add(conn: DbConn, user: UserId, recipient: ::geschenke::UserId, data: Form<Add>) -> QueryResult<Content<String>> {
-    let new = NewGeschenk {
+    let new = NewPresent {
         short_description: &data.get().short_description,
         creator: Some(user.0),
         recipient,
     };
-    let geschenk = insert_into(geschenke::table)
+    let present = insert_into(presents::table)
         .values(&new)
-        .get_result::<Geschenk>(&*conn)?;
-    render(conn, user, geschenk)
+        .get_result::<Present>(&*conn)?;
+    render(conn, user, present)
 }
 
 // FIXME: don't allow adding/editing presents for anyone but your friends
 
 #[post("/edit/<id>", data = "<data>")]
-fn edit(conn: DbConn, user: UserId, id: GeschenkId, data: Form<Edit>) -> QueryResult<Content<String>> {
-    let geschenk = update(geschenke::table.filter(geschenke::id.eq(id)))
-        .set(geschenke::description.eq(&data.get().description))
-        .get_result::<Geschenk>(&*conn)?;
-    render(conn, user, geschenk)
+fn edit(conn: DbConn, user: UserId, id: PresentId, data: Form<Edit>) -> QueryResult<Content<String>> {
+    let present = update(presents::table.filter(presents::id.eq(id)))
+        .set(presents::description.eq(&data.get().description))
+        .get_result::<Present>(&*conn)?;
+    render(conn, user, present)
 }
 
 #[get("/edit/<id>")]
-fn view(conn: DbConn, user: UserId, id: GeschenkId) -> QueryResult<Content<String>> {
-    let geschenk = ::geschenke::get_present(&*conn, user.0, id)?;
-    render(conn, user, geschenk)
+fn view(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Content<String>> {
+    let present = ::geschenke::get_present(&*conn, user.0, id)?;
+    render(conn, user, present)
 }
 
-fn render(conn: DbConn, user: UserId, geschenk: Geschenk) -> QueryResult<Content<String>> {
-    let recipient_name = if geschenk.recipient == user.0 {
+fn render(conn: DbConn, user: UserId, present: Present) -> QueryResult<Content<String>> {
+    let recipient_name = if present.recipient == user.0 {
         "You".to_string()
     } else {
         users::table
-            .filter(users::id.eq(geschenk.recipient))
+            .filter(users::id.eq(present.recipient))
             .select(users::name)
             .get_result::<String>(&*conn)?
     };
-    let Geschenk {
+    let Present {
         short_description,
         id,
         recipient,
         description,
         ..
-    } = geschenk;
+    } = present;
     Ok(ui::render(&short_description, None, html!(
-        form(action=format!("/geschenk/edit/{}", id), method="post") {
+        form(action=format!("/present/edit/{}", id), method="post") {
             :"The present is for ";
             a(href=format!("/user/{}", recipient)) { :recipient_name } br;
             :"Description:";

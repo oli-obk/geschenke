@@ -1,7 +1,7 @@
 use rocket_contrib::Json;
 
-use geschenke::models::{Geschenk, User};
-use geschenke::schema::geschenke;
+use geschenke::models::{Present, User};
+use geschenke::schema::presents;
 use geschenke::schema::users;
 use geschenke::UserId;
 use rocket::http::Cookies;
@@ -29,9 +29,9 @@ fn user_info(conn: DbConn, mut cookies: Cookies) -> QueryResult<Json<Option<User
     }
 }
 
-#[get("/geschenke")]
-fn get_geschenke(conn: DbConn) -> QueryResult<Json<Vec<Geschenk>>> {
-    geschenke::table
-        .load::<Geschenk>(&*conn)
+#[get("/presents")]
+fn get_presents(conn: DbConn) -> QueryResult<Json<Vec<Present>>> {
+    presents::table
+        .load::<Present>(&*conn)
         .map(Json)
 }

@@ -36,10 +36,10 @@ fn main() {
             api::account::login,
             api::account::login_key,
         ])
-        .mount("/geschenk", routes![
-            api::geschenk::edit,
-            api::geschenk::view,
-            api::geschenk::add,
+        .mount("/present", routes![
+            api::present::edit,
+            api::present::view,
+            api::present::add,
         ])
         .mount("/user", routes![
             api::user::add_friend,
@@ -53,7 +53,7 @@ fn main() {
     ;
     let rocket = if option_env!("ROCKET_ENV").unwrap_or("development") == "development" {
         rocket.mount("/debugging", routes![
-            api::debugging::get_geschenke,
+            api::debugging::get_presents,
             api::debugging::get_users,
             api::debugging::user_info,
         ])

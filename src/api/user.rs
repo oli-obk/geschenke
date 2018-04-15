@@ -87,18 +87,18 @@ pub fn print_wishlist(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> Qu
             .get_result::<String>(&*conn)?;
         format!("{}'s wishlist", name)
     };
-    let geschenke = show_presents_for_user(&*conn, me.0, user)?;
-    let user_url = format!("/geschenk/add/{}", user);
+    let presents = show_presents_for_user(&*conn, me.0, user)?;
+    let user_url = format!("/present/add/{}", user);
     Ok((html!(
         table {
             tr {
                 td { : "Description" }
             }
-            @for geschenk in geschenke {
+            @for present in presents {
                 tr {
-                    td { : geschenk.short_description }
+                    td { : present.short_description }
                     td {
-                        a(href = format!("/geschenk/edit/{}", geschenk.id)) { : "Edit" }
+                        a(href = format!("/present/edit/{}", present.id)) { : "Edit" }
                     }
                 }
             }

@@ -1,5 +1,5 @@
 table! {
-    geschenke (id) {
+    presents (id) {
         id -> Int4,
         short_description -> Varchar,
         description -> Nullable<Text>,
@@ -30,7 +30,7 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
-    geschenke,
+    presents,
     users,
     friends,
 );
