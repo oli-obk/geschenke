@@ -57,20 +57,19 @@ fn create_user(conn: &PgConnection, mailstrom: State<Mail>, name: &str, email_ad
     email.set_to(email_address).unwrap();
     email.set_subject("Geschenke App Registration").unwrap();
     let body = format!(
-        "Someone (probably you) has created an account for this email address at https://geschenke.oli-obk.de .\r\n\
+        "Someone (probably you) has created an account for {email_address} at https://geschenke.oli-obk.de .\r\n\
         \r\n\
         Click the following link to login:\r\n\
-        https://geschenke.oli-obk.de/account/login_form_key?key={} \r\n\
+        https://geschenke.oli-obk.de/account/login_form_key?key={autologin} \r\n\
         \r\n\
         Your friendly neighborhood Geschenke-Bot\r\n\
         \r\n\
         \r\n\
         If it was not you, visit\r\n\
-        https://geschenke.oli-obk.de/nuke/{}/{}.\r\n\
+        https://geschenke.oli-obk.de/nuke/{autologin}.\r\n\
         to remove your email address from our database\r\n",
-        email_address,
-        autologin,
-        autologin,
+        email_address = email_address,
+        autologin = autologin,
     );
     println!("{:?}", body);
     email.set_body(&*body).unwrap();
