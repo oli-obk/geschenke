@@ -33,7 +33,7 @@ pub struct Geschenk {
     pub short_description: String,
     pub description: Option<String>,
     pub creator: Option<UserId>,
-    pub receiver: UserId,
+    pub recipient: UserId,
     pub gifter: Option<UserId>,
     pub reserved_date: Option<DateTime>,
     pub gifted_date: Option<DateTime>,
@@ -44,5 +44,5 @@ pub struct Geschenk {
 pub struct NewGeschenk<'a> {
     pub short_description: &'a str,
     pub creator: Option<UserId>,
-    pub receiver: UserId,
+    pub recipient: UserId,
 }

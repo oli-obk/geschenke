@@ -18,12 +18,12 @@ struct Add {
     short_description: String,
 }
 
-#[post("/add/<receiver>", data = "<data>")]
-fn add(conn: DbConn, user: UserId, receiver: ::geschenke::UserId, data: Form<Add>) -> QueryResult<Content<String>> {
+#[post("/add/<recipient>", data = "<data>")]
+fn add(conn: DbConn, user: UserId, recipient: ::geschenke::UserId, data: Form<Add>) -> QueryResult<Content<String>> {
     let new = NewGeschenk {
         short_description: &data.get().short_description,
         creator: Some(user.0),
-        receiver,
+        recipient,
     };
     let geschenk = insert_into(geschenke::table)
         .values(&new)
@@ -48,25 +48,25 @@ fn view(conn: DbConn, user: UserId, id: GeschenkId) -> QueryResult<Content<Strin
 }
 
 fn render(conn: DbConn, user: UserId, geschenk: Geschenk) -> QueryResult<Content<String>> {
-    let receiver_name = if geschenk.receiver == user.0 {
+    let recipient_name = if geschenk.recipient == user.0 {
         "You".to_string()
     } else {
         users::table
-            .filter(users::id.eq(geschenk.receiver))
+            .filter(users::id.eq(geschenk.recipient))
             .select(users::name)
             .get_result::<String>(&*conn)?
     };
     let Geschenk {
         short_description,
         id,
-        receiver,
+        recipient,
         description,
         ..
     } = geschenk;
     Ok(ui::render(&short_description, None, html!(
         form(action=format!("/geschenk/edit/{}", id), method="post") {
             :"The present is for ";
-            a(href=format!("/user/{}", receiver)) { :receiver_name } br;
+            a(href=format!("/user/{}", recipient)) { :recipient_name } br;
             :"Description:";
             input(type="textarea", name="description", value = description); br;
             button { : "Save" }

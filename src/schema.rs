@@ -4,7 +4,7 @@ table! {
         short_description -> Varchar,
         description -> Nullable<Text>,
         creator -> Nullable<Int4>,
-        receiver -> Int4,
+        recipient -> Int4,
         gifter -> Nullable<Int4>,
         reserved_date -> Nullable<Timestamp>,
         gifted_date -> Nullable<Timestamp>,

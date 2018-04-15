@@ -94,7 +94,7 @@ pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: Us
     if viewer == recipient {
         // show only the presents that the user created himself
         geschenke::table
-            .filter(geschenke::receiver.eq(recipient)
+            .filter(geschenke::recipient.eq(recipient)
                 .and(geschenke::creator.eq(viewer)))
             .load::<Geschenk>(&*conn)
     } else {
@@ -106,7 +106,7 @@ pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: Us
             .get_result(&*conn)?;
         if n == 1 {
             geschenke::table
-                .filter(geschenke::receiver.eq(recipient))
+                .filter(geschenke::recipient.eq(recipient))
                 .load::<Geschenk>(&*conn)
         } else {
             assert_eq!(n, 0);
@@ -120,7 +120,7 @@ pub fn get_present(conn: &PgConnection, viewer: UserId, geschenk: GeschenkId) ->
 
     let check_id = geschenke::id.eq(geschenk);
     let created_by_viewer = geschenke::creator.eq(viewer);
-    let is_friend = friends::friend.eq(geschenke::receiver);
+    let is_friend = friends::friend.eq(geschenke::recipient);
     let viewer_friends = friends::id.eq(viewer).and(is_friend);
 
     geschenke::table
@@ -132,7 +132,7 @@ pub fn get_present(conn: &PgConnection, viewer: UserId, geschenk: GeschenkId) ->
             geschenke::short_description,
             geschenke::description,
             geschenke::creator,
-            geschenke::receiver,
+            geschenke::recipient,
             geschenke::gifter,
             geschenke::reserved_date,
             geschenke::gifted_date,
