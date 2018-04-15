@@ -8,8 +8,10 @@ before_install:
   - tar -xf openssl-1.1.0h.tar.gz
   - cd openssl-1.1.0h
   - ./Configure linux-x86_64 -fPIC
-  - make -j4 #&>/dev/null
+  - make -j4 &>/dev/null
   - sudo make install #&>/dev/null
+  - export OPENSSL_LIB_DIR=/usr/local/lib
+  - export OPENSSL_INCLUDE_DIR=/usr/local/include
   - cd ..
   - rm -rf openssl-*
   - rustup component add rls-preview
