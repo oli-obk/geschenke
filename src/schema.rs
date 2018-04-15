@@ -6,7 +6,7 @@ table! {
         creator -> Nullable<Int4>,
         receiver -> Int4,
         gifter -> Nullable<Int4>,
-        obtained_date -> Nullable<Timestamp>,
+        reserved_date -> Nullable<Timestamp>,
         gifted_date -> Nullable<Timestamp>,
     }
 }

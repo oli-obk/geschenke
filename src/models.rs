@@ -35,7 +35,7 @@ pub struct Geschenk {
     pub creator: Option<UserId>,
     pub receiver: UserId,
     pub gifter: Option<UserId>,
-    pub obtained_date: Option<DateTime>,
+    pub reserved_date: Option<DateTime>,
     pub gifted_date: Option<DateTime>,
 }
 

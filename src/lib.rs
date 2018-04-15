@@ -223,7 +223,7 @@ pub fn get_present(conn: &PgConnection, viewer: UserId, geschenk: GeschenkId) ->
             geschenke::creator,
             geschenke::receiver,
             geschenke::gifter,
-            geschenke::obtained_date,
+            geschenke::reserved_date,
             geschenke::gifted_date,
         ))
         .get_result::<Geschenk>(&*conn)
