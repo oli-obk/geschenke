@@ -63,7 +63,7 @@ fn render(conn: DbConn, user: UserId, geschenk: Geschenk) -> QueryResult<Content
         description,
         ..
     } = geschenk;
-    Ok(ui::render(&short_description, html!(
+    Ok(ui::render(&short_description, None, html!(
         form(action=format!("/geschenk/edit/{}", id), method="post") {
             :"The present is for ";
             a(href=format!("/user/{}", receiver)) { :receiver_name } br;

@@ -34,11 +34,11 @@ fn hello(conn: DbConn, user: Option<UserId>, flash: Option<FlashMessage>) -> Que
     if let Some(user) = user {
         logged_in::hello_user(conn, user, flash)
     } else {
-        Ok(Content(ContentType::HTML, hello_generic()))
+        Ok(Content(ContentType::HTML, hello_generic(flash)))
     }
 }
 
-fn hello_generic() -> String {
+fn hello_generic(flash: Option<FlashMessage>) -> String {
     html! (
         : doctype::HTML;
         html {
@@ -46,6 +46,10 @@ fn hello_generic() -> String {
                 title : "Geschenkeplanungsapp";
             }
             body {
+                @if let Some(flash) = flash {
+                    span (style = flash.name()) {: flash.msg() }
+                    br;
+                }
                 @if option_env!("ROCKET_ENV").unwrap_or("development") == "development" {
                     h1 { : "Debugging" }
                     a(href="debugging/geschenke") { : "Database dump of presents" } br;

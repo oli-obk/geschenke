@@ -3,21 +3,15 @@ pub mod schema;
 
 #[macro_use]
 extern crate diesel;
-extern crate chrono;
 extern crate sha3;
-extern crate rand;
-extern crate mailstrom;
-extern crate email_format;
+extern crate chrono;
 #[macro_use] extern crate serde_derive;
 
 use diesel::prelude::*;
 use diesel::result::Error as DieselError;
 use diesel::pg::PgConnection;
-use chrono::prelude::*;
 
-use rand::distributions::{IndependentSample, Range};
-
-use self::models::NewUser;
+pub use self::models::NewUser;
 pub use self::models::NewGeschenk;
 pub use self::models::Geschenk;
 
@@ -94,91 +88,8 @@ impl From<::diesel::result::Error> for UserCreationError {
     }
 }
 
-pub fn create_user(conn: &PgConnection, name: &str, email_address: &str) -> Result<UserId, UserCreationError> {
-    let email_address = email_address.trim();
-    if email_address.chars().any(|c| c.is_whitespace()) || email_address.chars().filter(|&c| c == '@').count() != 1 {
-        return Err(UserCreationError::InvalidEmailAddress);
-    }
-    use schema::users;
-
-    let mut autologin = String::new();
-    let range = Range::new(b'a', b'z');
-    let mut rng = rand::thread_rng();
-    for _ in 0..100 {
-        let c = range.ind_sample(&mut rng);
-        autologin.push(c as char)
-    }
-
-    use email_format::Email;
-    use mailstrom::{Mailstrom, Config, MemoryStorage};
-    let now: DateTime<Utc> = Utc::now();
-    let mut email = Email::new(
-        "geschenke@oli-obk.de",  // "From:"
-        &now, // "Date:"
-    ).unwrap();
-
-    email.set_sender("geschenke@oli-obk.de").unwrap();
-    email.set_to(email_address).unwrap();
-    email.set_subject("Geschenke App Registration").unwrap();
-    let body = format!(
-        "Someone (probably you) has created an account for this email address at https://geschenke.oli-obk.de .\r\n\
-        \r\n\
-        If it was not you, visit\r\n\
-        https://geschenke.oli-obk.de/nuke/{}/{}.\r\n\
-        \r\n\
-        Click the following link to login:\r\n\
-        https://geschenke.oli-obk.de/account/login_form_key?key={} \r\n\
-        \r\n\
-        Your friendly neighborhood Geschenke-Bot",
-        email_address,
-        autologin,
-        autologin,
-    );
-    println!("{:?}", body);
-    email.set_body(&*body).unwrap();
-
-    let mut mailstrom = Mailstrom::new(
-        Config {
-            helo_name: "geschenke.oli-obk.de".to_owned(),
-            smtp_timeout_secs: 30,
-            ..Default::default()
-        },
-        MemoryStorage::new());
-
-    // We must explicitly tell mailstrom to start actually sending emails.  If we
-    // were only interested in reading the status of previously sent emails, we
-    // would not send this command.
-    mailstrom.start().unwrap();
-
-    let message_id = mailstrom.send_email(email).unwrap();
-
-    // Later on, after the worker thread has had time to process the request,
-    // you can check the status:
-
-    loop {
-        let status = mailstrom.query_status(&*message_id).unwrap();
-        if status.completed() {
-            if !status.succeeded() {
-                println!("{:?}", status);
-                return Err(UserCreationError::CouldNotSendMail);
-            }
-            break;
-        }
-    }
-
-    let id = diesel::insert_into(users::table)
-        .values(&NewUser {
-            name,
-            email: email_address,
-            autologin: &autologin,
-        })
-        .returning(users::id)
-        .get_result::<UserId>(conn)?;
-    Ok(id)
-}
-
 pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Geschenk>> {
-    use schema::{geschenke, friends};
+    use schema::geschenke;
 
     if viewer == recipient {
         // show only the presents that the user created himself

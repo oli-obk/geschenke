@@ -88,7 +88,7 @@ pub fn view(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<
         format!("{}'s wishlist", name)
     };
     let geschenke = show_presents_for_user(&*conn, me.0, user)?;
-    Ok(ui::render(&title, html!(
+    Ok(ui::render(&title, None, html!(
         table {
             tr {
                 td { : "Description" }

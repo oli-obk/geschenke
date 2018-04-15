@@ -7,6 +7,10 @@ extern crate diesel;
 extern crate rocket;
 extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
+extern crate mailstrom;
+extern crate email_format;
+extern crate rand;
+extern crate chrono;
 
 extern crate r2d2_diesel;
 extern crate r2d2;
@@ -19,6 +23,7 @@ use rocket::Request;
 mod api;
 mod pool;
 mod ui;
+mod mail;
 
 fn main() {
     let rocket = rocket::ignite()
@@ -57,6 +62,7 @@ fn main() {
     };
     rocket
         .manage(pool::establish_connection())
+        .manage(mail::init())
         .launch();
 }
 

@@ -23,11 +23,7 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
     // presents I created for myself
     let geschenke = show_presents_for_user(&*conn, id.0, id.0)?;
     let title = format!("Hello {}!", user_info.name);
-    Ok(ui::render(&title, html!(
-        @if let Some(flash) = flash {
-            span (style = flash.name()) {: flash.msg() }
-            br;
-        }
+    Ok(ui::render(&title, flash, html!(
         h2 { : "Your wishlist" }
         // make this reusable in /user/id
         @if !geschenke.is_empty() {
