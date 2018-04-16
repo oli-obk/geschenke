@@ -47,8 +47,15 @@ fn add(conn: DbConn, user: UserId, recipient: ::geschenke::UserId, data: Option<
         };
         let present = insert_into(presents::table)
             .values(&new)
-            .get_result::<Present>(&*conn)?;
-        Ok(Flash::success(Redirect::to(&format!("/present/edit/{}", present.id)), "Added new present"))
+            .get_result::<Present>(&*conn);
+        use diesel::result::{Error, DatabaseErrorKind};
+        match present {
+            Ok(present) => Ok(Flash::success(Redirect::to(&format!("/present/edit/{}", present.id)), "Added new present")),
+            Err(Error::DatabaseError(DatabaseErrorKind::UniqueViolation, ref what)) if what.constraint_name() == Some("no_dups_present_short_descriptions") => {
+                Ok(Flash::error(Redirect::to(&format!("/user/{}", recipient)), "A present with the same name already exists"))
+            }
+            Err(other) => Err(other),
+        }
     } else {
         Ok(Flash::error(Redirect::to(&format!("/user/{}", recipient)), "Cannot add a present without a description"))
     }
