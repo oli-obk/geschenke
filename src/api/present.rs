@@ -64,11 +64,11 @@ fn add(conn: DbConn, user: UserId, recipient: ::geschenke::UserId, data: Option<
 // FIXME: don't allow adding/editing presents for anyone but your friends
 
 #[post("/edit/<id>", data = "<data>")]
-fn edit(conn: DbConn, user: UserId, id: PresentId, data: Form<Edit>) -> QueryResult<Content<String>> {
+fn edit(conn: DbConn, user: UserId, id: PresentId, data: Form<Edit>) -> QueryResult<Flash<Redirect>>  {
     let present = update(presents::table.filter(presents::id.eq(id)))
         .set(presents::description.eq(&data.get().description))
         .get_result::<Present>(&*conn)?;
-    render(conn, user, present)
+    Ok(Flash::success(Redirect::to(&format!("/user/{}", present.recipient)), "Present saved"))
 }
 
 #[get("/delete/<id>")]
