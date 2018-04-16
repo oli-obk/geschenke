@@ -101,6 +101,9 @@ pub fn print_wishlist(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> Qu
                     td {
                         a(href = format!("/present/edit/{}", present.id)) { : "Edit" }
                     }
+                    td {
+                        a(href = format!("/present/delete/{}", present.id)) { : "Delete" }
+                    }
                 }
             }
         }

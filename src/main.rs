@@ -40,6 +40,7 @@ fn main() {
             api::present::edit,
             api::present::view,
             api::present::add,
+            api::present::delete,
         ])
         .mount("/user", routes![
             api::user::add_friend,

@@ -2,7 +2,7 @@ use rocket::response::Content;
 use geschenke::schema::{presents, users};
 use pool::DbConn;
 use diesel::prelude::*;
-use diesel::{update, insert_into};
+use diesel::{update, insert_into, self};
 use geschenke::{PresentId, Present, NewPresent};
 use rocket::response::{Flash, Redirect};
 use rocket::request::{Form, FromFormValue};
@@ -62,6 +62,13 @@ fn edit(conn: DbConn, user: UserId, id: PresentId, data: Form<Edit>) -> QueryRes
         .set(presents::description.eq(&data.get().description))
         .get_result::<Present>(&*conn)?;
     render(conn, user, present)
+}
+
+#[get("/delete/<id>")]
+fn delete(conn: DbConn, _user: UserId, id: PresentId) -> QueryResult<Flash<Redirect>> {
+    let present = diesel::delete(presents::table.filter(presents::id.eq(id)))
+        .get_result::<Present>(&*conn)?;
+    Ok(Flash::success(Redirect::to(&format!("/user/{}", present.recipient)), "Deleted present"))
 }
 
 #[get("/edit/<id>")]
