@@ -35,6 +35,7 @@ fn main() {
             api::account::logout,
             api::account::login,
             api::account::login_key,
+            api::account::recover,
         ])
         .mount("/present", routes![
             api::present::edit,

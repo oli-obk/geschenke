@@ -3,7 +3,13 @@ use rocket::http::{Cookies, Cookie};
 use rocket::response::{Flash, Redirect};
 use rocket::request::Form;
 use geschenke::{login_with_password, login_with_key};
+use geschenke::schema::users;
 use diesel::prelude::*;
+use diesel;
+use rocket::State;
+use mail::Mail;
+use chrono::prelude::*;
+use email_format::Email;
 
 /// Remove the `user_id` cookie.
 #[get("/logout")]
@@ -17,6 +23,12 @@ struct Login {
     email: String,
     password: String,
 }
+
+#[derive(Deserialize, FromForm)]
+struct Recover {
+    email: String,
+}
+
 
 #[derive(FromForm)]
 struct Key {
@@ -42,4 +54,49 @@ fn login(conn: DbConn, mut cookies: Cookies, login: Form<Login>) -> QueryResult<
     } else {
         Ok(Flash::error(Redirect::to("/"), "Unknown email address or wrong password"))
     }
+}
+
+#[post("/recover", data = "<recover>")]
+fn recover(conn: DbConn, recover: Form<Recover>, mailstrom: State<Mail>) -> QueryResult<Flash<Redirect>> {
+    let email = &recover.get().email;
+    let new_autologin = ::api::registration::gen_autologin();
+    recover_login(&*conn, email, &new_autologin, mailstrom)?;
+
+    // we don't leak whether that user has an account
+    Ok(Flash::success(Redirect::to("/"), "Email with new login key sent"))
+}
+
+pub fn recover_login(conn: &PgConnection, email_address: &str, new_autologin: &str, mailstrom: State<Mail>) -> QueryResult<()> {
+    let updated = diesel::update(users::table.filter(users::email.eq(email_address)))
+        .set(users::autologin.eq(new_autologin))
+        .execute(conn)?;
+    assert!(updated <= 1);
+    if updated == 1 {
+        let now: DateTime<Utc> = Utc::now();
+        let mut email = Email::new(
+            "geschenke@oli-obk.de",  // "From:"
+            &now, // "Date:"
+        ).unwrap();
+
+        email.set_sender("geschenke@oli-obk.de").unwrap();
+        email.set_to(email_address).unwrap();
+        email.set_subject("Geschenke App Login").unwrap();
+        let body = format!(
+            "Someone (probably you) has requested a new login link for https://geschenke.oli-obk.de .\r\n\
+            \r\n\
+            Click the following link to login:\r\n\
+            https://geschenke.oli-obk.de/account/login_form_key?key={autologin} \r\n\
+            \r\n\
+            Your friendly neighborhood Geschenke-Bot\r\n\
+            \r\n\
+            \r\n\
+            If it was not you, no damage has been done, just use the new login link\r\n\
+            Your account is still perfectly safe\r\n",
+            autologin = new_autologin,
+        );
+        email.set_body(&*body).unwrap();
+
+        mailstrom.lock().unwrap().send_email(email).unwrap();
+    }
+    Ok(())
 }

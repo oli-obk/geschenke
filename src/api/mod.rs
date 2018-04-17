@@ -69,12 +69,18 @@ fn hello_generic(flash: Option<FlashMessage>) -> String {
                         button { : "Login" }
                     }
                 }
-                : "To login click on the login link that is in every email that you get.";
+                : "To login click on the login link that is in every email that you get."; br;
                 h1 { : "Register" }
                 form(action="registration/register_form", method="post") {
                     :"Name:";  input(name="name" ); br;
                     :"Email:"; input(name="email"); br;
                     button { : "Register" }
+                }
+                h1 { : "Forgotten Login" }
+                : "Make sure to enter the correct email address below, no emails will be sent if you enter a wrong email address.";
+                form(action="account/recover", method="post") {
+                    :"Email:"; input(name="email"); br;
+                    button { : "Resend login email" }
                 }
             }
         }
