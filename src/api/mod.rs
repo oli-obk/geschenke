@@ -70,7 +70,7 @@ fn hello_generic(flash: Option<FlashMessage>, lang: Lang) -> String {
                         button { : "Login" }
                     }
                 }
-                : "To login click on the login link that is in every email that you get."; br;
+                : lang.format("info-login", None); br;
                 h1 { : "Register" }
                 form(action="registration/register_form", method="post") {
                     :"Name:";  input(name="name" ); br;
