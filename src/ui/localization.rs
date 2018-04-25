@@ -22,7 +22,7 @@ impl<'a> Lang<'a> {
                 }
             }
         }
-        panic!("no localization at all for {:?}", id);
+        format!("TRANSLATION-NOT-AVAILABLE: {:?}", id)
     }
 }
 
