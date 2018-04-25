@@ -78,7 +78,8 @@ pub fn remove_friend(conn: DbConn, user: UserId, delete_friend: Form<RemoveUser>
 }
 
 pub fn print_wishlist(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> QueryResult<(impl RenderOnce, String)> {
-    let title = if me.0 == user {
+    let you = me.0 == user;
+    let title = if you {
         "Your wishlist".to_owned()
     } else {
         let name = users::table
@@ -90,22 +91,58 @@ pub fn print_wishlist(conn: DbConn, me: UserId, user: ::geschenke::UserId) -> Qu
     };
     let presents = show_presents_for_user(&*conn, me.0, user)?;
     let user_url = format!("/present/add/{}", user);
-    Ok((html!(
-        table {
-            tr {
-                td { : "Description" }
-            }
-            @for present in presents {
+
+    Ok((owned_html!(
+        @if !presents.is_empty() {
+            table(border=1) {
                 tr {
-                    td { : present.short_description }
-                    td {
-                        a(href = format!("/present/edit/{}", present.id)) { : "Edit" }
+                    th { : "Present" }
+                    @if !you {
+                        th { : "Status" }
                     }
-                    td {
-                        a(href = format!("/present/delete/{}", present.id)) { : "Delete" }
+                    th { : "Details" }
+                    th { : "Delete" }
+                }
+                @for present in presents {
+                    tr {
+                        td { : present.short_description }
+                        @if !you {
+                            @if let Some(gifter) = present.gifter_id {
+                                td {
+                                    @if gifter == me.0 {
+                                        : "Reserved by you";
+                                    } else {
+                                        : "Reserved by ";
+                                        a(href = format!("/user/{}", gifter)) { : present.gifter; }
+                                    }
+                                }
+                            } else {
+                                td {
+                                    :"Available, click ";
+                                    a(href = format!("/present/gift/{}", present.id)) { : "here" }
+                                    :" to claim";
+                                }
+                            }
+                        }
+                        td {
+                            // FIXME: make description not an option anymore
+                            a(href = format!("/present/edit/{}", present.id)) { : "Edit" }
+                            @if let Some(descr) = present.description {
+                                @if !descr.is_empty() {
+                                    details {
+                                        : descr;
+                                    }
+                                }
+                            }
+                        }
+                        td {
+                            a(href = format!("/present/delete/{}", present.id)) { : "Delete" }
+                        }
                     }
                 }
             }
+        } else {
+            : "No presents in your wishlist. Add some to let others know what you want"
         }
         form(action=user_url, method="post") {
             input (name = "short_description", placeholder = "short description");

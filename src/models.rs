@@ -39,6 +39,19 @@ pub struct Present {
     pub gifted_date: Option<DateTime>,
 }
 
+#[derive(Queryable, Serialize, Debug)]
+pub struct PresentWithGifter {
+    pub id: i32,
+    pub short_description: String,
+    pub description: Option<String>,
+    pub creator: Option<UserId>,
+    pub recipient: UserId,
+    pub gifter_id: Option<UserId>,
+    pub reserved_date: Option<DateTime>,
+    pub gifted_date: Option<DateTime>,
+    pub gifter: Option<String>,
+}
+
 #[derive(Insertable)]
 #[table_name="presents"]
 pub struct NewPresent<'a> {

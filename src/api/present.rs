@@ -9,6 +9,7 @@ use rocket::request::{Form, FromFormValue};
 use rocket::http::RawStr;
 use super::UserId;
 use ui;
+use chrono::prelude::*;
 
 #[derive(Deserialize, FromForm)]
 struct Edit {
@@ -78,6 +79,15 @@ fn delete(conn: DbConn, _user: UserId, id: PresentId) -> QueryResult<Flash<Redir
     Ok(Flash::success(Redirect::to(&format!("/user/{}", present.recipient)), "Deleted present"))
 }
 
+#[get("/gift/<id>")]
+fn gift(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Flash<Redirect>> {
+    let now: NaiveDateTime = Utc::now().naive_utc();
+    let present = diesel::update(presents::table.filter(presents::id.eq(id).and(presents::recipient.ne(user.0))))
+        .set((presents::reserved_date.eq(Some(now)), presents::gifter.eq(Some(user.0))))
+        .get_result::<Present>(&*conn)?;
+    Ok(Flash::success(Redirect::to(&format!("/user/{}", present.recipient)), "Everybody can now see that you are going to gift this present"))
+}
+
 #[get("/edit/<id>")]
 fn view(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Content<String>> {
     let present = ::geschenke::get_present(&*conn, user.0, id)?;
@@ -85,7 +95,8 @@ fn view(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Content<String
 }
 
 fn render(conn: DbConn, user: UserId, present: Present) -> QueryResult<Content<String>> {
-    let recipient_name = if present.recipient == user.0 {
+    let you = present.recipient == user.0;
+    let recipient_name = if you {
         "You".to_string()
     } else {
         users::table
@@ -98,12 +109,33 @@ fn render(conn: DbConn, user: UserId, present: Present) -> QueryResult<Content<S
         id,
         recipient,
         description,
+        reserved_date,
+        gifter,
         ..
     } = present;
+    let gifter = match gifter {
+        Some(gifter) => Some(users::table
+            .filter(users::id.eq(gifter))
+            .select(users::name)
+            .get_result::<String>(&*conn)?),
+        None => None,
+    };
+    let recipient = html!(a(href=format!("/user/{}", recipient)) { :&recipient_name });
     Ok(ui::render(&short_description, None, html!(
         form(action=format!("/present/edit/{}", id), method="post") {
             :"The present is for ";
-            a(href=format!("/user/{}", recipient)) { :recipient_name } br;
+            :&recipient; br;
+            @if !you {
+                @if let Some(reserved_date) = reserved_date {
+                    :"On ";
+                    :reserved_date.format("%Y-%m-%d").to_string();
+                    :" ";
+                    :gifter.unwrap();
+                    :" selected this present to gift to ";
+                    :recipient;
+                }
+            }
+            br;
             :"Description:";
             input(type="textarea", name="description", value = description); br;
             button { : "Save" }

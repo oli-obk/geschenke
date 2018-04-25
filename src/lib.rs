@@ -13,7 +13,7 @@ use diesel::pg::PgConnection;
 
 pub use self::models::NewUser;
 pub use self::models::NewPresent;
-pub use self::models::Present;
+pub use self::models::{Present, PresentWithGifter, User};
 
 pub type UserId = i32;
 pub type PresentId = i32;
@@ -88,15 +88,26 @@ impl From<::diesel::result::Error> for UserCreationError {
     }
 }
 
-pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<Present>> {
-    use schema::presents;
+pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<PresentWithGifter>> {
+    use schema::{presents, users};
 
     if viewer == recipient {
-        // show only the presents that the user created himself
+        // show only the presents that the user created themself
         presents::table
             .filter(presents::recipient.eq(recipient)
                 .and(presents::creator.eq(viewer)))
             .load::<Present>(&*conn)
+            .map(|p| p.into_iter().map(|p| PresentWithGifter {
+                gifter: None,
+                id: p.id,
+                short_description: p.short_description,
+                description: p.description,
+                creator: p.creator,
+                recipient: p.recipient,
+                gifter_id: p.gifter,
+                reserved_date: p.reserved_date,
+                gifted_date: p.gifted_date,
+            }).collect())
     } else {
         use schema::{presents, friends};
 
@@ -107,7 +118,19 @@ pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: Us
         if n == 1 {
             presents::table
                 .filter(presents::recipient.eq(recipient))
-                .load::<Present>(&*conn)
+                .left_join(users::table.on(presents::gifter.eq(users::id.nullable())))
+                .select((
+                    presents::id,
+                    presents::short_description,
+                    presents::description,
+                    presents::creator,
+                    presents::recipient,
+                    presents::gifter,
+                    presents::reserved_date,
+                    presents::gifted_date,
+                    users::name.nullable(),
+                ))
+                .load(&*conn)
         } else {
             assert_eq!(n, 0);
             Err(DieselError::NotFound)

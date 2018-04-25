@@ -42,6 +42,7 @@ fn main() {
             api::present::view,
             api::present::add,
             api::present::delete,
+            api::present::gift,
         ])
         .mount("/user", routes![
             api::user::add_friend,
