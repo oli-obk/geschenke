@@ -17,6 +17,8 @@ extern crate r2d2;
 extern crate dotenv;
 #[macro_use]
 extern crate horrorshow;
+extern crate fluent;
+extern crate accept_language;
 
 use rocket::Request;
 
@@ -66,6 +68,7 @@ fn main() {
     rocket
         .manage(pool::establish_connection())
         .manage(mail::init())
+        .manage(ui::localization::load())
         .launch();
 }
 

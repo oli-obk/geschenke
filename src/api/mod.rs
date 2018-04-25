@@ -6,6 +6,7 @@ use pool::DbConn;
 use diesel::QueryResult;
 use rocket::outcome::IntoOutcome;
 use rocket::request::{self, Request, FromRequest, FlashMessage};
+use ui::localization::Lang;
 
 pub mod debugging;
 pub mod registration;
@@ -30,20 +31,20 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserId {
 }
 
 #[get("/")]
-fn hello(conn: DbConn, user: Option<UserId>, flash: Option<FlashMessage>) -> QueryResult<Content<String>> {
+fn hello(conn: DbConn, lang: Lang, user: Option<UserId>, flash: Option<FlashMessage>) -> QueryResult<Content<String>> {
     if let Some(user) = user {
         logged_in::hello_user(conn, user, flash)
     } else {
-        Ok(Content(ContentType::HTML, hello_generic(flash)))
+        Ok(Content(ContentType::HTML, hello_generic(flash, lang)))
     }
 }
 
-fn hello_generic(flash: Option<FlashMessage>) -> String {
+fn hello_generic(flash: Option<FlashMessage>, lang: Lang) -> String {
     html! (
         : doctype::HTML;
         html {
             head {
-                title : "Geschenkeplanungsapp";
+                title : lang.format("app-name", None);
             }
             body {
                 @if let Some(flash) = flash {

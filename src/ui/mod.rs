@@ -4,6 +4,8 @@ use rocket::response::Content;
 use rocket::http::ContentType;
 use rocket::request::FlashMessage;
 
+pub mod localization;
+
 pub fn render<PAGE: RenderOnce>(
     title: &str,
     flash: Option<FlashMessage>,

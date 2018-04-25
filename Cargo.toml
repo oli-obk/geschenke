@@ -4,14 +4,13 @@ name = "geschenke"
 version = "0.1.0"
 
 [dependencies]
+accept-language = "1.1.0"
 dotenv = "0.9.0"
-email-format = { version = "0.6.0", features = ["chrono"] }
-horrorshow = { git = "https://github.com/Stebalien/horrorshow-rs.git" }
+fluent = "0.2.0"
 mailstrom = "0.4.0"
 r2d2 = "0.8"
 r2d2-diesel = "1.0"
 rand = "0.4.2"
-rocket = { version = "0.3.6", features = ["tls"] }
 rocket_codegen = "0.3.6"
 rocket_contrib = "0.3.6"
 serde = "1.0"
@@ -28,3 +27,14 @@ features = [
     "chrono",
 ]
 version = "1.0.0"
+
+[dependencies.email-format]
+features = ["chrono"]
+version = "0.6.0"
+
+[dependencies.horrorshow]
+git = "https://github.com/Stebalien/horrorshow-rs.git"
+
+[dependencies.rocket]
+features = ["tls"]
+version = "0.3.6"

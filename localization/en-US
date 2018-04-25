@@ -1,0 +1,91 @@
+hello-world = Hello, world!
+
+## general stuff
+you-big = You
+you-small = you
+
+## app name
+app-name = Geschenkeplanungsapp
+
+## add friend
+already-friends = You are already friends
+friend-self-hugging = You cannot befriend yourself
+added-friend = Added new friend
+unregistered-friend = Could not add unregistered friend
+
+## delete friend
+deleted-friend = Deleted friend
+friend-not-deleted = Could not delete friend
+
+## wishlist
+delete = Delete
+edit = Edit
+create-present = Create new present
+recipient = The present is for { $recipient }
+description = Description
+save = Save
+
+## present addition/editing/removal
+added-present = Added new present
+present-exists = A present with the same name already exists
+not-adding-without-description = Cannot add a present without a description
+present-saved = Present saved
+present-deleted = Deleted present
+
+## Logging in/out
+login-successful = Successfully logged in.
+logout-successful = Successfully logged out.
+wrong-key = Wrong or old login key
+wrong-mail-or-password = Unknown email address or wrong password
+forgotten-login = Forgotten Login
+
+## Login interface
+login = Login
+register = Register
+mail = E-Mail
+password = Password
+key = Key
+
+## info texts
+info-login = To login click on the login link that is in every email that you get.
+info-enter-correct-email = Make sure to enter the correct email address below, no emails will be sent if you enter a wrong email address.
+info-resend-login-mail = Resend login email
+
+## emails
+login-mail =
+    Someone (probably you) has requested a new login link for https://geschenke.oli-obk.de .\r\n\
+    \r\n\
+    Click the following link to login:\r\n\
+    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin } \r\n\
+    \r\n\
+    Your friendly neighborhood Geschenke-Bot\r\n\
+    \r\n\
+    \r\n\
+    If it was not you, no damage has been done, just use the new login link\r\n\
+    Your account is still perfectly safe\r\n
+registration-mail =
+    Someone (probably you) has created an account for {email_address} at https://geschenke.oli-obk.de .\r\n\
+    \r\n\
+    Click the following link to login:\r\n\
+    https://geschenke.oli-obk.de/account/login_form_key?key={autologin} \r\n\
+    \r\n\
+    Your friendly neighborhood Geschenke-Bot\r\n\
+    \r\n\
+    \r\n\
+    If it was not you, visit\r\n\
+    https://geschenke.oli-obk.de/nuke/{autologin}.\r\n\
+    to remove your email address from our database\r\n
+
+## dashboard (logged_in)
+home = Home
+intro = Hello, { $name }.
+wishlist = Your wishlist
+friends = Friends
+add-friend = Add friend
+logout = Logout
+
+## registration
+email-sent = An email with login instructions has been sent to { $email }
+email-alread-registered = This email is already registered
+email-invalid = That's not an email address
+email-not-sent = Please contact an admin, emails could not be sent
