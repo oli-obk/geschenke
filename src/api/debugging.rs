@@ -1,18 +1,16 @@
 use rocket_contrib::Json;
 
+use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 use geschenke::models::{Present, User};
 use geschenke::schema::presents;
 use geschenke::schema::users;
 use geschenke::UserId;
-use rocket::http::Cookies;
-use diesel::{QueryResult, RunQueryDsl, QueryDsl, ExpressionMethods};
 use pool::DbConn;
+use rocket::http::Cookies;
 
 #[get("/users")]
 fn get_users(conn: DbConn) -> QueryResult<Json<Vec<User>>> {
-    users::table
-        .load::<User>(&*conn)
-        .map(Json)
+    users::table.load::<User>(&*conn).map(Json)
 }
 
 #[get("/user_info")]
@@ -31,7 +29,5 @@ fn user_info(conn: DbConn, mut cookies: Cookies) -> QueryResult<Json<Option<User
 
 #[get("/presents")]
 fn get_presents(conn: DbConn) -> QueryResult<Json<Vec<Present>>> {
-    presents::table
-        .load::<Present>(&*conn)
-        .map(Json)
+    presents::table.load::<Present>(&*conn).map(Json)
 }

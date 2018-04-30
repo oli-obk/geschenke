@@ -1,16 +1,20 @@
-use geschenke::models::User;
-use geschenke::schema::users;
-use geschenke::schema::friends;
+use api::user::print_wishlist;
 use diesel::prelude::*;
+use geschenke::models::User;
+use geschenke::schema::friends;
+use geschenke::schema::users;
 use pool::DbConn;
 use rocket::request::FlashMessage;
-use ui;
 use rocket::response::Content;
-use api::user::print_wishlist;
+use ui;
 
 use super::UserId;
 
-pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> QueryResult<Content<String>> {
+pub fn hello_user(
+    conn: DbConn,
+    id: UserId,
+    flash: Option<FlashMessage>,
+) -> QueryResult<Content<String>> {
     let int_id = id.0;
     let user_info = users::table
         .filter(users::id.eq(int_id))
@@ -22,7 +26,10 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
         .load::<(String, ::geschenke::UserId)>(&*conn)?;
     let (wishlist, _) = print_wishlist(conn, id, int_id)?;
     let title = format!("Hello {}!", user_info.name);
-    Ok(ui::render(&title, flash, html!(
+    Ok(ui::render(
+        &title,
+        flash,
+        html!(
         h2 { : "Your wishlist" }
         // make this reusable in /user/id
         : wishlist;
@@ -46,5 +53,6 @@ pub fn hello_user(conn: DbConn, id: UserId, flash: Option<FlashMessage>) -> Quer
             input (name = "email", placeholder = "email address") {}
             button { : "Add friend" }
         }
-    )))
+    ),
+    ))
 }

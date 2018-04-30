@@ -1,15 +1,15 @@
-use pool::DbConn;
-use rocket::http::{Cookies, Cookie};
-use rocket::response::{Flash, Redirect};
-use rocket::request::Form;
-use geschenke::{login_with_password, login_with_key};
-use geschenke::schema::users;
-use diesel::prelude::*;
-use diesel;
-use rocket::State;
-use mail::Mail;
 use chrono::prelude::*;
+use diesel;
+use diesel::prelude::*;
 use email_format::Email;
+use geschenke::schema::users;
+use geschenke::{login_with_key, login_with_password};
+use mail::Mail;
+use pool::DbConn;
+use rocket::http::{Cookie, Cookies};
+use rocket::request::Form;
+use rocket::response::{Flash, Redirect};
+use rocket::State;
 
 /// Remove the `user_id` cookie.
 #[get("/logout")]
@@ -29,12 +29,10 @@ struct Recover {
     email: String,
 }
 
-
 #[derive(FromForm)]
 struct Key {
-    key: String
+    key: String,
 }
-
 
 #[get("/login_form_key?<key>")]
 fn login_key(conn: DbConn, mut cookies: Cookies, key: Key) -> QueryResult<Flash<Redirect>> {
@@ -52,21 +50,36 @@ fn login(conn: DbConn, mut cookies: Cookies, login: Form<Login>) -> QueryResult<
         cookies.add_private(Cookie::new("user_id", id.to_string()));
         Ok(Flash::success(Redirect::to("/"), "Successfully logged in."))
     } else {
-        Ok(Flash::error(Redirect::to("/"), "Unknown email address or wrong password"))
+        Ok(Flash::error(
+            Redirect::to("/"),
+            "Unknown email address or wrong password",
+        ))
     }
 }
 
 #[post("/recover", data = "<recover>")]
-fn recover(conn: DbConn, recover: Form<Recover>, mailstrom: State<Mail>) -> QueryResult<Flash<Redirect>> {
+fn recover(
+    conn: DbConn,
+    recover: Form<Recover>,
+    mailstrom: State<Mail>,
+) -> QueryResult<Flash<Redirect>> {
     let email = &recover.get().email;
     let new_autologin = ::api::registration::gen_autologin();
     recover_login(&*conn, email, &new_autologin, mailstrom)?;
 
     // we don't leak whether that user has an account
-    Ok(Flash::success(Redirect::to("/"), "Email with new login key sent"))
+    Ok(Flash::success(
+        Redirect::to("/"),
+        "Email with new login key sent",
+    ))
 }
 
-pub fn recover_login(conn: &PgConnection, email_address: &str, new_autologin: &str, mailstrom: State<Mail>) -> QueryResult<()> {
+pub fn recover_login(
+    conn: &PgConnection,
+    email_address: &str,
+    new_autologin: &str,
+    mailstrom: State<Mail>,
+) -> QueryResult<()> {
     let updated = diesel::update(users::table.filter(users::email.eq(email_address)))
         .set(users::autologin.eq(new_autologin))
         .execute(conn)?;
@@ -74,8 +87,8 @@ pub fn recover_login(conn: &PgConnection, email_address: &str, new_autologin: &s
     if updated == 1 {
         let now: DateTime<Utc> = Utc::now();
         let mut email = Email::new(
-            "geschenke@oli-obk.de",  // "From:"
-            &now, // "Date:"
+            "geschenke@oli-obk.de", // "From:"
+            &now,                   // "Date:"
         ).unwrap();
 
         email.set_sender("geschenke@oli-obk.de").unwrap();

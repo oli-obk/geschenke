@@ -1,18 +1,18 @@
-use rocket::response::Content;
-use rocket::http::ContentType;
-use horrorshow::prelude::*;
-use horrorshow::helper::doctype;
-use pool::DbConn;
 use diesel::QueryResult;
+use horrorshow::helper::doctype;
+use horrorshow::prelude::*;
+use pool::DbConn;
+use rocket::http::ContentType;
 use rocket::outcome::IntoOutcome;
-use rocket::request::{self, Request, FromRequest, FlashMessage};
+use rocket::request::{self, FlashMessage, FromRequest, Request};
+use rocket::response::Content;
 use ui::localization::Lang;
 
-pub mod debugging;
-pub mod registration;
 pub mod account;
+pub mod debugging;
 pub mod logged_in;
 pub mod present;
+pub mod registration;
 pub mod user;
 
 /// Automatically obtains a user id from cookies
@@ -22,7 +22,8 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserId {
     type Error = ();
 
     fn from_request(request: &'a Request<'r>) -> request::Outcome<UserId, ()> {
-        request.cookies()
+        request
+            .cookies()
             .get_private("user_id")
             .and_then(|cookie| cookie.value().parse().ok())
             .map(UserId)
@@ -31,7 +32,12 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserId {
 }
 
 #[get("/")]
-fn hello(conn: DbConn, lang: Lang, user: Option<UserId>, flash: Option<FlashMessage>) -> QueryResult<Content<String>> {
+fn hello(
+    conn: DbConn,
+    lang: Lang,
+    user: Option<UserId>,
+    flash: Option<FlashMessage>,
+) -> QueryResult<Content<String>> {
     if let Some(user) = user {
         logged_in::hello_user(conn, user, flash)
     } else {
@@ -85,5 +91,6 @@ fn hello_generic(flash: Option<FlashMessage>, lang: Lang) -> String {
                 }
             }
         }
-    ).into_string().unwrap()
+    ).into_string()
+        .unwrap()
 }

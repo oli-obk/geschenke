@@ -29,8 +29,8 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
+allow_tables_to_appear_in_same_query!{
     presents,
     users,
     friends,
-);
+}

@@ -1,4 +1,4 @@
-use mailstrom::{Mailstrom, Config, MemoryStorage};
+use mailstrom::{Config, Mailstrom, MemoryStorage};
 use std::sync::{Arc, Mutex};
 
 pub type Mail = Arc<Mutex<Mailstrom<MemoryStorage>>>;
@@ -10,8 +10,8 @@ pub fn init() -> Mail {
             smtp_timeout_secs: 30,
             ..Default::default()
         },
-        MemoryStorage::new());
+        MemoryStorage::new(),
+    );
     mailstrom.start().unwrap();
     Arc::new(Mutex::new(mailstrom))
 }
-

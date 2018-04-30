@@ -3,16 +3,17 @@ pub mod schema;
 
 #[macro_use]
 extern crate diesel;
-extern crate sha3;
 extern crate chrono;
-#[macro_use] extern crate serde_derive;
+extern crate sha3;
+#[macro_use]
+extern crate serde_derive;
 
+use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result::Error as DieselError;
-use diesel::pg::PgConnection;
 
-pub use self::models::NewUser;
 pub use self::models::NewPresent;
+pub use self::models::NewUser;
 pub use self::models::{Present, PresentWithGifter, User};
 
 pub type UserId = i32;
@@ -52,18 +53,20 @@ pub fn login_with_password(
         .filter(users::email.eq(email_address))
         .get_result::<(Option<String>, Option<String>, UserId)>(conn)
         .optional()
-        .map(|result| result.and_then(|(password_hash, salt, id)| {
-            let password_hash = password_hash?;
-            let salt = salt?;
-            let mut hasher = Sha3_512::default();
-            hasher.input(pw.as_bytes());
-            hasher.input(salt.as_bytes());
-            if hasher.result().as_slice() == password_hash.as_bytes() {
-                Some(id)
-            } else {
-                None
-            }
-        }))
+        .map(|result| {
+            result.and_then(|(password_hash, salt, id)| {
+                let password_hash = password_hash?;
+                let salt = salt?;
+                let mut hasher = Sha3_512::default();
+                hasher.input(pw.as_bytes());
+                hasher.input(salt.as_bytes());
+                if hasher.result().as_slice() == password_hash.as_bytes() {
+                    Some(id)
+                } else {
+                    None
+                }
+            })
+        })
 }
 
 pub fn set_pw(conn: &PgConnection, user: UserId, pw: String) -> QueryResult<()> {
@@ -88,28 +91,39 @@ impl From<::diesel::result::Error> for UserCreationError {
     }
 }
 
-pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: UserId) -> QueryResult<Vec<PresentWithGifter>> {
+pub fn show_presents_for_user(
+    conn: &PgConnection,
+    viewer: UserId,
+    recipient: UserId,
+) -> QueryResult<Vec<PresentWithGifter>> {
     use schema::{presents, users};
 
     if viewer == recipient {
         // show only the presents that the user created themself
         presents::table
-            .filter(presents::recipient.eq(recipient)
-                .and(presents::creator.eq(viewer)))
+            .filter(
+                presents::recipient
+                    .eq(recipient)
+                    .and(presents::creator.eq(viewer)),
+            )
             .load::<Present>(&*conn)
-            .map(|p| p.into_iter().map(|p| PresentWithGifter {
-                gifter: None,
-                id: p.id,
-                short_description: p.short_description,
-                description: p.description,
-                creator: p.creator,
-                recipient: p.recipient,
-                gifter_id: p.gifter,
-                reserved_date: p.reserved_date,
-                gifted_date: p.gifted_date,
-            }).collect())
+            .map(|p| {
+                p.into_iter()
+                    .map(|p| PresentWithGifter {
+                        gifter: None,
+                        id: p.id,
+                        short_description: p.short_description,
+                        description: p.description,
+                        creator: p.creator,
+                        recipient: p.recipient,
+                        gifter_id: p.gifter,
+                        reserved_date: p.reserved_date,
+                        gifted_date: p.gifted_date,
+                    })
+                    .collect()
+            })
     } else {
-        use schema::{presents, friends};
+        use schema::{friends, presents};
 
         let n: i64 = friends::table
             .filter(friends::friend.eq(recipient).and(friends::id.eq(viewer)))
@@ -138,8 +152,12 @@ pub fn show_presents_for_user(conn: &PgConnection, viewer: UserId, recipient: Us
     }
 }
 
-pub fn get_present(conn: &PgConnection, viewer: UserId, present: PresentId) -> QueryResult<Present> {
-    use schema::{presents, friends};
+pub fn get_present(
+    conn: &PgConnection,
+    viewer: UserId,
+    present: PresentId,
+) -> QueryResult<Present> {
+    use schema::{friends, presents};
 
     let check_id = presents::id.eq(present);
     let created_by_viewer = presents::creator.eq(viewer);

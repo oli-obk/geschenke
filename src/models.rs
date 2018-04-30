@@ -1,6 +1,6 @@
+use super::schema::{friends, presents, users};
 use chrono::NaiveDateTime as DateTime;
-use super::schema::{users, presents, friends};
-use {UserId, AutologinKey};
+use {AutologinKey, UserId};
 
 #[derive(Queryable, Serialize, Debug)]
 pub struct User {
@@ -13,7 +13,7 @@ pub struct User {
 }
 
 #[derive(Insertable)]
-#[table_name="users"]
+#[table_name = "users"]
 pub struct NewUser<'a> {
     pub name: &'a str,
     pub email: &'a str,
@@ -21,7 +21,7 @@ pub struct NewUser<'a> {
 }
 
 #[derive(Insertable)]
-#[table_name="friends"]
+#[table_name = "friends"]
 pub struct NewFriend {
     pub id: UserId,
     pub friend: UserId,
@@ -53,7 +53,7 @@ pub struct PresentWithGifter {
 }
 
 #[derive(Insertable)]
-#[table_name="presents"]
+#[table_name = "presents"]
 pub struct NewPresent<'a> {
     pub short_description: &'a str,
     pub creator: Option<UserId>,

@@ -1,16 +1,16 @@
 use pool::DbConn;
 
-use geschenke::UserCreationError;
-use diesel::{QueryResult, self, RunQueryDsl};
-use diesel::pg::PgConnection;
-use rocket::request::Form;
-use rocket::response::{Redirect, Flash};
-use rocket::State;
-use mail::Mail;
-use geschenke::NewUser;
-use rand::distributions::{IndependentSample, Range};
-use rand;
 use chrono::prelude::*;
+use diesel::pg::PgConnection;
+use diesel::{self, QueryResult, RunQueryDsl};
+use geschenke::NewUser;
+use geschenke::UserCreationError;
+use mail::Mail;
+use rand;
+use rand::distributions::{IndependentSample, Range};
+use rocket::request::Form;
+use rocket::response::{Flash, Redirect};
+use rocket::State;
 
 #[derive(Deserialize, FromForm)]
 struct User {
@@ -19,13 +19,32 @@ struct User {
 }
 
 #[post("/register_form", data = "<user>")]
-fn create_user_form(conn: DbConn, mailstrom: State<Mail>, user: Form<User>) -> QueryResult<Flash<Redirect>> {
+fn create_user_form(
+    conn: DbConn,
+    mailstrom: State<Mail>,
+    user: Form<User>,
+) -> QueryResult<Flash<Redirect>> {
     let email = &user.get().email;
     match create_user(&*conn, mailstrom, &user.get().name, email) {
-        Ok(()) => Ok(Flash::success(Redirect::to("/"), format!("An email with login instructions has been sent to {}", email))),
-        Err(UserCreationError::EmailAlreadyExists) => Ok(Flash::error(Redirect::to("/"), "This email is already registered")),
-        Err(UserCreationError::InvalidEmailAddress) => Ok(Flash::error(Redirect::to("/"), "That's not an email address")),
-        Err(UserCreationError::CouldNotSendMail) => Ok(Flash::error(Redirect::to("/"), "Please contact an admin, emails could not be sent")),
+        Ok(()) => Ok(Flash::success(
+            Redirect::to("/"),
+            format!(
+                "An email with login instructions has been sent to {}",
+                email
+            ),
+        )),
+        Err(UserCreationError::EmailAlreadyExists) => Ok(Flash::error(
+            Redirect::to("/"),
+            "This email is already registered",
+        )),
+        Err(UserCreationError::InvalidEmailAddress) => Ok(Flash::error(
+            Redirect::to("/"),
+            "That's not an email address",
+        )),
+        Err(UserCreationError::CouldNotSendMail) => Ok(Flash::error(
+            Redirect::to("/"),
+            "Please contact an admin, emails could not be sent",
+        )),
         Err(UserCreationError::Diesel(diesel)) => Err(diesel),
     }
 }
@@ -43,9 +62,16 @@ pub fn gen_autologin() -> String {
     autologin
 }
 
-fn create_user(conn: &PgConnection, mailstrom: State<Mail>, name: &str, email_address: &str) -> Result<(), UserCreationError> {
+fn create_user(
+    conn: &PgConnection,
+    mailstrom: State<Mail>,
+    name: &str,
+    email_address: &str,
+) -> Result<(), UserCreationError> {
     let email_address = email_address.trim();
-    if email_address.chars().any(|c| c.is_whitespace()) || email_address.chars().filter(|&c| c == '@').count() != 1 {
+    if email_address.chars().any(|c| c.is_whitespace())
+        || email_address.chars().filter(|&c| c == '@').count() != 1
+    {
         return Err(UserCreationError::InvalidEmailAddress);
     }
     use geschenke::schema::users;
@@ -64,8 +90,8 @@ fn create_user(conn: &PgConnection, mailstrom: State<Mail>, name: &str, email_ad
         // added new entry
         let now: DateTime<Utc> = Utc::now();
         let mut email = Email::new(
-            "geschenke@oli-obk.de",  // "From:"
-            &now, // "Date:"
+            "geschenke@oli-obk.de", // "From:"
+            &now,                   // "Date:"
         ).unwrap();
 
         email.set_sender("geschenke@oli-obk.de").unwrap();

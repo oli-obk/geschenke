@@ -1,8 +1,8 @@
-use horrorshow::prelude::*;
 use horrorshow::helper::doctype;
-use rocket::response::Content;
+use horrorshow::prelude::*;
 use rocket::http::ContentType;
 use rocket::request::FlashMessage;
+use rocket::response::Content;
 
 pub mod localization;
 
@@ -29,6 +29,7 @@ pub fn render<PAGE: RenderOnce>(
                 :page;
             }
         }
-    ).into_string().unwrap();
+    ).into_string()
+        .unwrap();
     Content(ContentType::HTML, page)
 }

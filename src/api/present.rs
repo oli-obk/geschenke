@@ -1,15 +1,15 @@
-use rocket::response::Content;
-use geschenke::schema::{presents, users};
-use pool::DbConn;
-use diesel::prelude::*;
-use diesel::{update, insert_into, self};
-use geschenke::{PresentId, Present, NewPresent};
-use rocket::response::{Flash, Redirect};
-use rocket::request::{Form, FromFormValue};
-use rocket::http::RawStr;
 use super::UserId;
-use ui;
 use chrono::prelude::*;
+use diesel::prelude::*;
+use diesel::{self, insert_into, update};
+use geschenke::schema::{presents, users};
+use geschenke::{NewPresent, Present, PresentId};
+use pool::DbConn;
+use rocket::http::RawStr;
+use rocket::request::{Form, FromFormValue};
+use rocket::response::Content;
+use rocket::response::{Flash, Redirect};
+use ui;
 
 #[derive(Deserialize, FromForm)]
 struct Edit {
@@ -39,7 +39,12 @@ impl<'v> FromFormValue<'v> for ShortDescription {
 }
 
 #[post("/add/<recipient>", data = "<data>")]
-fn add(conn: DbConn, user: UserId, recipient: ::geschenke::UserId, data: Option<Form<Add>>) -> QueryResult<Flash<Redirect>> {
+fn add(
+    conn: DbConn,
+    user: UserId,
+    recipient: ::geschenke::UserId,
+    data: Option<Form<Add>>,
+) -> QueryResult<Flash<Redirect>> {
     if let Some(data) = data {
         let new = NewPresent {
             short_description: &data.get().short_description.0,
@@ -49,43 +54,72 @@ fn add(conn: DbConn, user: UserId, recipient: ::geschenke::UserId, data: Option<
         let present = insert_into(presents::table)
             .values(&new)
             .get_result::<Present>(&*conn);
-        use diesel::result::{Error, DatabaseErrorKind};
+        use diesel::result::{DatabaseErrorKind, Error};
         match present {
-            Ok(present) => Ok(Flash::success(Redirect::to(&format!("/present/edit/{}", present.id)), "Added new present")),
-            Err(Error::DatabaseError(DatabaseErrorKind::UniqueViolation, ref what)) if what.constraint_name() == Some("no_dups_present_short_descriptions") => {
-                Ok(Flash::error(Redirect::to(&format!("/user/{}", recipient)), "A present with the same name already exists"))
+            Ok(present) => Ok(Flash::success(
+                Redirect::to(&format!("/present/edit/{}", present.id)),
+                "Added new present",
+            )),
+            Err(Error::DatabaseError(DatabaseErrorKind::UniqueViolation, ref what))
+                if what.constraint_name() == Some("no_dups_present_short_descriptions") =>
+            {
+                Ok(Flash::error(
+                    Redirect::to(&format!("/user/{}", recipient)),
+                    "A present with the same name already exists",
+                ))
             }
             Err(other) => Err(other),
         }
     } else {
-        Ok(Flash::error(Redirect::to(&format!("/user/{}", recipient)), "Cannot add a present without a description"))
+        Ok(Flash::error(
+            Redirect::to(&format!("/user/{}", recipient)),
+            "Cannot add a present without a description",
+        ))
     }
 }
 
 // FIXME: don't allow adding/editing presents for anyone but your friends
 
 #[post("/edit/<id>", data = "<data>")]
-fn edit(conn: DbConn, _user: UserId, id: PresentId, data: Form<Edit>) -> QueryResult<Flash<Redirect>>  {
+fn edit(
+    conn: DbConn,
+    _user: UserId,
+    id: PresentId,
+    data: Form<Edit>,
+) -> QueryResult<Flash<Redirect>> {
     let present = update(presents::table.filter(presents::id.eq(id)))
         .set(presents::description.eq(&data.get().description))
         .get_result::<Present>(&*conn)?;
-    Ok(Flash::success(Redirect::to(&format!("/user/{}", present.recipient)), "Present saved"))
+    Ok(Flash::success(
+        Redirect::to(&format!("/user/{}", present.recipient)),
+        "Present saved",
+    ))
 }
 
 #[get("/delete/<id>")]
 fn delete(conn: DbConn, _user: UserId, id: PresentId) -> QueryResult<Flash<Redirect>> {
-    let present = diesel::delete(presents::table.filter(presents::id.eq(id)))
-        .get_result::<Present>(&*conn)?;
-    Ok(Flash::success(Redirect::to(&format!("/user/{}", present.recipient)), "Deleted present"))
+    let present =
+        diesel::delete(presents::table.filter(presents::id.eq(id))).get_result::<Present>(&*conn)?;
+    Ok(Flash::success(
+        Redirect::to(&format!("/user/{}", present.recipient)),
+        "Deleted present",
+    ))
 }
 
 #[get("/gift/<id>")]
 fn gift(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Flash<Redirect>> {
     let now: NaiveDateTime = Utc::now().naive_utc();
-    let present = diesel::update(presents::table.filter(presents::id.eq(id).and(presents::recipient.ne(user.0))))
-        .set((presents::reserved_date.eq(Some(now)), presents::gifter.eq(Some(user.0))))
+    let present = diesel::update(
+        presents::table.filter(presents::id.eq(id).and(presents::recipient.ne(user.0))),
+    ).set((
+        presents::reserved_date.eq(Some(now)),
+        presents::gifter.eq(Some(user.0)),
+    ))
         .get_result::<Present>(&*conn)?;
-    Ok(Flash::success(Redirect::to(&format!("/user/{}", present.recipient)), "Everybody can now see that you are going to gift this present"))
+    Ok(Flash::success(
+        Redirect::to(&format!("/user/{}", present.recipient)),
+        "Everybody can now see that you are going to gift this present",
+    ))
 }
 
 #[get("/edit/<id>")]
@@ -121,7 +155,10 @@ fn render(conn: DbConn, user: UserId, present: Present) -> QueryResult<Content<S
         None => None,
     };
     let recipient = html!(a(href=format!("/user/{}", recipient)) { :&recipient_name });
-    Ok(ui::render(&short_description, None, html!(
+    Ok(ui::render(
+        &short_description,
+        None,
+        html!(
         form(action=format!("/present/edit/{}", id), method="post") {
             :"The present is for ";
             :&recipient; br;
@@ -140,5 +177,6 @@ fn render(conn: DbConn, user: UserId, present: Present) -> QueryResult<Content<S
             input(type="textarea", name="description", value = description); br;
             button { : "Save" }
         }
-    )))
+    ),
+    ))
 }

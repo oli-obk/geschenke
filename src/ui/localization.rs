@@ -1,20 +1,16 @@
-use fluent::MessageContext;
 use fluent::types::FluentValue;
+use fluent::MessageContext;
 use std::collections::HashMap;
 
 use rocket::outcome::IntoOutcome;
-use rocket::request::{self, Request, FromRequest};
+use rocket::request::{self, FromRequest, Request};
 
 use accept_language::parse;
 
 use rocket::State;
 
 impl<'a> Lang<'a> {
-    pub fn format(
-        &self, 
-        id: &str,
-        args: Option<&HashMap<&str, FluentValue>>
-    ) -> String {
+    pub fn format(&self, id: &str, args: Option<&HashMap<&str, FluentValue>>) -> String {
         for ctx in &self.ctx {
             if let Some(msg) = ctx.get_message(id) {
                 if let Some(result) = ctx.format(msg, args) {
