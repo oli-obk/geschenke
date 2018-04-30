@@ -10,6 +10,7 @@ use rocket::http::{Cookie, Cookies};
 use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
 use rocket::State;
+use ui::localization::Lang;
 
 /// Remove the `user_id` cookie.
 #[get("/logout")]
@@ -62,10 +63,11 @@ fn recover(
     conn: DbConn,
     recover: Form<Recover>,
     mailstrom: State<Mail>,
+    lang: Lang,
 ) -> QueryResult<Flash<Redirect>> {
     let email = &recover.get().email;
     let new_autologin = ::api::registration::gen_autologin();
-    recover_login(&*conn, email, &new_autologin, mailstrom)?;
+    recover_login(&*conn, email, &new_autologin, mailstrom, lang)?;
 
     // we don't leak whether that user has an account
     Ok(Flash::success(
@@ -79,6 +81,7 @@ pub fn recover_login(
     email_address: &str,
     new_autologin: &str,
     mailstrom: State<Mail>,
+    lang: Lang,
 ) -> QueryResult<()> {
     let updated = diesel::update(users::table.filter(users::email.eq(email_address)))
         .set(users::autologin.eq(new_autologin))
@@ -94,18 +97,11 @@ pub fn recover_login(
         email.set_sender("geschenke@oli-obk.de").unwrap();
         email.set_to(email_address).unwrap();
         email.set_subject("Geschenke App Login").unwrap();
-        let body = format!(
-            "Someone (probably you) has requested a new login link for https://geschenke.oli-obk.de .\r\n\
-            \r\n\
-            Click the following link to login:\r\n\
-            https://geschenke.oli-obk.de/account/login_form_key?key={autologin} \r\n\
-            \r\n\
-            Your friendly neighborhood Geschenke-Bot\r\n\
-            \r\n\
-            \r\n\
-            If it was not you, no damage has been done, just use the new login link\r\n\
-            Your account is still perfectly safe\r\n",
-            autologin = new_autologin,
+        let body = lang.format(
+            "login-mail",
+            fluent_map!{
+                "autologin" => new_autologin,
+            },
         );
         email.set_body(&*body).unwrap();
 

@@ -10,10 +10,10 @@ use accept_language::parse;
 use rocket::State;
 
 impl<'a> Lang<'a> {
-    pub fn format(&self, id: &str, args: Option<&HashMap<&str, FluentValue>>) -> String {
+    pub fn format(&self, id: &str, args: Option<HashMap<&str, FluentValue>>) -> String {
         for ctx in &self.ctx {
             if let Some(msg) = ctx.get_message(id) {
-                if let Some(result) = ctx.format(msg, args) {
+                if let Some(result) = ctx.format(msg, args.as_ref()) {
                     return result;
                 }
             }
@@ -25,6 +25,13 @@ impl<'a> Lang<'a> {
 pub struct Lang<'a> {
     // contexts ordered in the preferred user order
     ctx: Vec<&'a MessageContext<'static>>,
+}
+
+#[macro_export]
+macro_rules! fluent_map {
+    ($($name:expr => $val:expr,)*) => {Some(hashmap!{
+        $($name => ::fluent::types::FluentValue::from($val),)*
+    })}
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for Lang<'r> {

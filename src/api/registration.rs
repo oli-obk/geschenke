@@ -11,6 +11,7 @@ use rand::distributions::{IndependentSample, Range};
 use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
 use rocket::State;
+use ui::localization::Lang;
 
 #[derive(Deserialize, FromForm)]
 struct User {
@@ -23,9 +24,10 @@ fn create_user_form(
     conn: DbConn,
     mailstrom: State<Mail>,
     user: Form<User>,
+    lang: Lang,
 ) -> QueryResult<Flash<Redirect>> {
     let email = &user.get().email;
-    match create_user(&*conn, mailstrom, &user.get().name, email) {
+    match create_user(&*conn, mailstrom, &user.get().name, email, lang) {
         Ok(()) => Ok(Flash::success(
             Redirect::to("/"),
             format!(
@@ -67,6 +69,7 @@ fn create_user(
     mailstrom: State<Mail>,
     name: &str,
     email_address: &str,
+    lang: Lang,
 ) -> Result<(), UserCreationError> {
     let email_address = email_address.trim();
     if email_address.chars().any(|c| c.is_whitespace())
@@ -97,27 +100,19 @@ fn create_user(
         email.set_sender("geschenke@oli-obk.de").unwrap();
         email.set_to(email_address).unwrap();
         email.set_subject("Geschenke App Registration").unwrap();
-        let body = format!(
-            "Someone (probably you) has created an account for {email_address} at https://geschenke.oli-obk.de .\r\n\
-            \r\n\
-            Click the following link to login:\r\n\
-            https://geschenke.oli-obk.de/account/login_form_key?key={autologin} \r\n\
-            \r\n\
-            Your friendly neighborhood Geschenke-Bot\r\n\
-            \r\n\
-            \r\n\
-            If it was not you, visit\r\n\
-            https://geschenke.oli-obk.de/nuke/{autologin}.\r\n\
-            to remove your email address from our database\r\n",
-            email_address = email_address,
-            autologin = autologin,
+        let body = lang.format(
+            "registration-mail",
+            fluent_map!{
+                "email_address" => email_address,
+                "autologin" => autologin,
+            },
         );
         email.set_body(&*body).unwrap();
 
         mailstrom.lock().unwrap().send_email(email).unwrap();
     } else if count == 0 {
         // just send a new email with a key, the user probably forgot they had an account
-        ::api::account::recover_login(conn, email_address, &autologin, mailstrom)?;
+        ::api::account::recover_login(conn, email_address, &autologin, mailstrom, lang)?;
     } else {
         panic!("inserting either inserts 1 row or 0");
     }

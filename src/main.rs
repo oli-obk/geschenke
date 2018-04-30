@@ -20,13 +20,16 @@ extern crate r2d2_diesel;
 extern crate horrorshow;
 extern crate accept_language;
 extern crate fluent;
+#[macro_use]
+extern crate maplit;
 
 use rocket::Request;
 
+#[macro_use]
+mod ui;
 mod api;
 mod mail;
 mod pool;
-mod ui;
 
 fn main() {
     let rocket = rocket::ignite()
