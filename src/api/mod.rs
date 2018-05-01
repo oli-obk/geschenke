@@ -15,6 +15,7 @@ pub mod present;
 pub mod registration;
 pub mod user;
 
+#[derive(Debug, Eq, Copy, Clone, PartialEq)]
 /// Automatically obtains a user id from cookies
 pub struct UserId(::geschenke::UserId);
 

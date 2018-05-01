@@ -50,6 +50,7 @@ pub fn hello_user(
             }
         }
         form(action="user/friend/add", method="post") {
+            input (name = "name", placeholder = "name") {}
             input (name = "email", placeholder = "email address") {}
             button { : "Add friend" }
         }
