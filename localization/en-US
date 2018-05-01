@@ -81,7 +81,7 @@ invite-mail =
     { $who } has invited you ({ $email_address }) to see their wishlist at https://geschenke.oli-obk.de .
     
     Click the following link to see the wishlist:
-    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }&wishlist={$inviter_id}
+    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }
     
     Your friendly neighborhood Geschenke-Bot
     
