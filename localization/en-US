@@ -53,28 +53,28 @@ info-resend-login-mail = Resend login email
 
 ## emails
 login-mail =
-    Someone (probably you) has requested a new login link for https://geschenke.oli-obk.de .\r\n\
-    \r\n\
-    Click the following link to login:\r\n\
-    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin } \r\n\
-    \r\n\
-    Your friendly neighborhood Geschenke-Bot\r\n\
-    \r\n\
-    \r\n\
-    If it was not you, no damage has been done, just use the new login link\r\n\
-    Your account is still perfectly safe\r\n
+    Someone (probably you) has requested a new login link for https://geschenke.oli-obk.de .
+    
+    Click the following link to login:
+    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }
+    
+    Your friendly neighborhood Geschenke-Bot
+    
+    
+    If it was not you, no damage has been done, just use the new login link
+    Your account is still perfectly safe
 registration-mail =
-    Someone (probably you) has created an account for { $email_address } at https://geschenke.oli-obk.de .\r\n\
-    \r\n\
-    Click the following link to login:\r\n\
-    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin } \r\n\
-    \r\n\
-    Your friendly neighborhood Geschenke-Bot\r\n\
-    \r\n\
-    \r\n\
-    If it was not you, visit\r\n\
-    https://geschenke.oli-obk.de/nuke/{ $autologin }.\r\n\
-    to remove your email address from our database\r\n
+    Someone (probably you) has created an account for { $email_address } at https://geschenke.oli-obk.de .
+    
+    Click the following link to login:
+    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }
+    
+    Your friendly neighborhood Geschenke-Bot
+    
+    
+    If it was not you, visit
+    https://geschenke.oli-obk.de/nuke/{ $autologin }.
+    to remove your email address from our database
 
 ## dashboard (logged_in)
 home = Home

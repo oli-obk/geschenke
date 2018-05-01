@@ -102,7 +102,7 @@ pub fn recover_login(
             fluent_map!{
                 "autologin" => new_autologin,
             },
-        );
+        ).replace('\n', "\r\n");
         email.set_body(&*body).unwrap();
 
         mailstrom.lock().unwrap().send_email(email).unwrap();
