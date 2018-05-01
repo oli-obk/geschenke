@@ -112,7 +112,7 @@ registration-mail =
     Der folgende Link loggt dich direkt in deinen Account ein:
     https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin } 
     
-    Falls jemand fremdes dies getan hat, klicke auf
+    Falls jemand Fremdes dies getan hat, klicke auf
     https://geschenke.oli-obk.de/nuke/{ $autologin }.
     um deinen Account wieder zu loeschen.
 invite-mail =
