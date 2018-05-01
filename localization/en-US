@@ -75,6 +75,18 @@ registration-mail =
     If it was not you, visit
     https://geschenke.oli-obk.de/nuke/{ $autologin }.
     to remove your email address from our database
+invite-mail =
+    { $who } has invited you ({ $email_address }) to see their wishlist at https://geschenke.oli-obk.de .
+    
+    Click the following link to see the wishlist:
+    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }&wishlist={$inviter_id}
+    
+    Your friendly neighborhood Geschenke-Bot
+    
+    
+    If you do not want your email address to be stored in our database, visit
+    https://geschenke.oli-obk.de/nuke/{ $autologin }.
+    to remove it.
 
 ## dashboard (logged_in)
 home = Home

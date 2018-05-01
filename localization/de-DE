@@ -99,28 +99,31 @@ info-resend-login-mail = Login { mail } erneut senden
 
 ## emails
 login-mail =
-    Someone (probably you) has requested a new login link for https://geschenke.oli-obk.de .
+    Jemand (vermutlich du) hat einen neuen Login-Link für https://geschenke.oli-obk.de angefordert.
     
-    Click the following link to login:
+    Der folgende Link loggt dich direkt in deinen Account ein:
     https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin } 
     
-    Your friendly neighborhood Geschenke-Bot
-    
-    
-    If it was not you, no damage has been done, just use the new login link
-    Your account is still perfectly safe
+    Falls das nicht du warst, mach dir keine Sorgen, dein Account ist weiterhin geschützt.
+    Nutze einfach ab jetzt den neuen Login-Link zum einloggen.
 registration-mail =
-    Someone (probably you) has created an account for { $email_address } at https://geschenke.oli-obk.de .
+    Jemand (vermutlich du) hat einen Account auf https://geschenke.oli-obk.de für { $email_address } erstellt.
     
-    Click the following link to login:
+    Der folgende Link loggt dich direkt in deinen Account ein:
     https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin } 
     
-    Your friendly neighborhood Geschenke-Bot
-    
-    
-    If it was not you, visit
+    Falls jemand fremdes dies getan hat, klicke auf
     https://geschenke.oli-obk.de/nuke/{ $autologin }.
-    to remove your email address from our database
+    um deinen Account wieder zu löschen.
+invite-mail =
+    { $who } hat seine Wunschliste für dich ({ $email_address }) freigegeben
+    
+    Der folgende Link führt direkt zur Wunschliste:
+    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }&wishlist={$inviter_id}
+    
+    Wenn du nicht möchtest, dass deine Emailaddresse in unserer Datenbank gespeichert wird, klicke auf
+    https://geschenke.oli-obk.de/nuke/{ $autologin }.
+    um die Emailaddresse zu löschen.
 
 ## dashboard (logged_in)
 home = Home

@@ -1,6 +1,5 @@
 use pool::DbConn;
 
-use chrono::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::{self, QueryResult, RunQueryDsl};
 use geschenke::NewUser;
@@ -12,6 +11,7 @@ use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
 use rocket::State;
 use ui::localization::Lang;
+use ui::send_mail;
 
 #[derive(Deserialize, FromForm)]
 struct User {
@@ -51,8 +51,6 @@ fn create_user_form(
     }
 }
 
-use email_format::Email;
-
 pub fn gen_autologin() -> String {
     let mut autologin = String::new();
     let range = Range::new(b'a', b'z');
@@ -91,25 +89,17 @@ fn create_user(
 
     if count == 1 {
         // added new entry
-        let now: DateTime<Utc> = Utc::now();
-        let mut email = Email::new(
-            "geschenke@oli-obk.de", // "From:"
-            &now,                   // "Date:"
-        ).unwrap();
-
-        email.set_sender("geschenke@oli-obk.de").unwrap();
-        email.set_to(email_address).unwrap();
-        email.set_subject("Geschenke App Registration").unwrap();
-        let body = lang.format(
+        send_mail(
+            mailstrom,
+            lang,
+            email_address,
+            "Geschenke App Registration",
             "registration-mail",
             fluent_map!{
                 "email_address" => email_address,
                 "autologin" => autologin,
             },
-        ).replace('\n', "\r\n");
-        email.set_body(&*body).unwrap();
-
-        mailstrom.lock().unwrap().send_email(email).unwrap();
+        );
     } else if count == 0 {
         // just send a new email with a key, the user probably forgot they had an account
         ::api::account::recover_login(conn, email_address, &autologin, mailstrom, lang)?;

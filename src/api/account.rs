@@ -1,7 +1,5 @@
-use chrono::prelude::*;
 use diesel;
 use diesel::prelude::*;
-use email_format::Email;
 use geschenke::schema::users;
 use geschenke::{login_with_key, login_with_password};
 use mail::Mail;
@@ -11,6 +9,7 @@ use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
 use rocket::State;
 use ui::localization::Lang;
+use ui::send_mail;
 
 /// Remove the `user_id` cookie.
 #[get("/logout")]
@@ -88,24 +87,16 @@ pub fn recover_login(
         .execute(conn)?;
     assert!(updated <= 1);
     if updated == 1 {
-        let now: DateTime<Utc> = Utc::now();
-        let mut email = Email::new(
-            "geschenke@oli-obk.de", // "From:"
-            &now,                   // "Date:"
-        ).unwrap();
-
-        email.set_sender("geschenke@oli-obk.de").unwrap();
-        email.set_to(email_address).unwrap();
-        email.set_subject("Geschenke App Login").unwrap();
-        let body = lang.format(
+        send_mail(
+            mailstrom,
+            lang,
+            email_address,
+            "Geschenke App Login",
             "login-mail",
             fluent_map!{
                 "autologin" => new_autologin,
             },
-        ).replace('\n', "\r\n");
-        email.set_body(&*body).unwrap();
-
-        mailstrom.lock().unwrap().send_email(email).unwrap();
+        );
     }
     Ok(())
 }
