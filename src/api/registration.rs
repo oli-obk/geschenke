@@ -52,7 +52,7 @@ pub fn gen_autologin() -> String {
 pub fn try_create_user(
     conn: &PgConnection,
     user: &User,
-) -> Result<(bool, String), UserCreationError> {
+) -> Result<(::geschenke::UserId, String), UserCreationError> {
     let email_address = user.email.trim();
     if email_address.chars().any(|c| c.is_whitespace())
         || email_address.chars().filter(|&c| c == '@').count() != 1
@@ -63,15 +63,15 @@ pub fn try_create_user(
 
     let autologin = gen_autologin();
 
-    let count = diesel::insert_into(users::table)
+    let id = diesel::insert_into(users::table)
         .values(&NewUser {
             name: &user.name,
             email: email_address,
             autologin: &autologin,
         })
-        .execute(conn)?;
-    assert!(count <= 1, "inserting either inserts 1 row or 0");
-    Ok((count == 1, autologin))
+        .returning(users::id)
+        .get_result(conn)?;
+    Ok((id, autologin))
 }
 
 pub fn user_creation_error(
@@ -100,23 +100,26 @@ fn create_user(
     user: &User,
     lang: Lang,
 ) -> Result<(), UserCreationError> {
-    let (new, autologin) = try_create_user(conn, user)?;
-    if new {
-        // added new entry
-        send_mail(
-            mailstrom,
-            lang,
-            &user.email,
-            "Geschenke App Registration",
-            "registration-mail",
-            fluent_map!{
-                "email_address" => user.email.clone(),
-                "autologin" => autologin,
-            },
-        );
-    } else {
-        // just send a new email with a key, the user probably forgot they had an account
-        ::api::account::recover_login(conn, &user.email, &autologin, mailstrom, lang)?;
+    match try_create_user(conn, user) {
+        Ok((_, autologin)) => {
+            // added new entry
+            send_mail(
+                mailstrom,
+                lang,
+                &user.email,
+                "Geschenke App Registration",
+                "registration-mail",
+                fluent_map!{
+                    "email_address" => user.email.clone(),
+                    "autologin" => autologin,
+                },
+            );
+        },
+        Err(_) => {
+            let autologin = gen_autologin();
+            // just send a new email with a key, the user probably forgot they had an account
+            ::api::account::recover_login(conn, &user.email, &autologin, mailstrom, lang)?;
+        },
     }
 
     Ok(())

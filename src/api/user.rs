@@ -29,14 +29,35 @@ pub fn add_friend(
     lang: Lang,
     new_friend: Form<User>,
 ) -> QueryResult<Flash<Redirect>> {
-    let (new, autologin) = match try_create_user(&*conn, &new_friend.get()) {
-        Ok(user) => user,
-        Err(err) => return user_creation_error(err),
-    };
     let friend = users::table
         .filter(users::email.eq(&new_friend.get().email))
         .select(users::id)
-        .get_result::<::geschenke::UserId>(&*conn)?;
+        .get_result::<::geschenke::UserId>(&*conn)
+        .optional()?;
+    let friend = match friend {
+        Some(friend) => friend,
+        None => {
+            match try_create_user(&*conn, &new_friend.get()) {
+                Ok((id, autologin)) => {
+                    ui::send_mail(
+                        mailstrom,
+                        lang,
+                        &new_friend.get().email,
+                        "Geschenke App Invitation",
+                        "invite-mail",
+                        fluent_map!{
+                            "email_address" => new_friend.get().email.clone(),
+                            "autologin" => autologin,
+                            "name" => new_friend.get().name.clone(),
+                            "who" => my_user_name(&*conn, user)?,
+                        },
+                    );
+                    id
+                },
+                Err(err) => return user_creation_error(err),
+            }
+        }
+    };
     enum Info {
         SelfHugging,
         Already,
@@ -70,21 +91,6 @@ pub fn add_friend(
                 "You cannot befriend yourself",
             ))
         }
-    }
-    if new {
-        ui::send_mail(
-            mailstrom,
-            lang,
-            &new_friend.get().email,
-            "Geschenke App Invitation",
-            "registration-mail",
-            fluent_map!{
-                "email_address" => new_friend.get().email.clone(),
-                "autologin" => autologin,
-                "name" => new_friend.get().name.clone(),
-                "who" => my_user_name(&*conn, user)?,
-            },
-        );
     }
     // if we didn't have the friend, we do have them now
     // try adding the reverse friendship, but ignore if already exists
