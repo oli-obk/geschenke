@@ -76,6 +76,8 @@ registration-mail =
     https://geschenke.oli-obk.de/nuke/{ $autologin }.
     to remove your email address from our database
 invite-mail =
+    Hi { $name },
+    
     { $who } has invited you ({ $email_address }) to see their wishlist at https://geschenke.oli-obk.de .
     
     Click the following link to see the wishlist:

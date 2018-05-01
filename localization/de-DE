@@ -99,31 +99,33 @@ info-resend-login-mail = Login { mail } erneut senden
 
 ## emails
 login-mail =
-    Jemand (vermutlich du) hat einen neuen Login-Link für https://geschenke.oli-obk.de angefordert.
+    Jemand (vermutlich du) hat einen neuen Login-Link fuer https://geschenke.oli-obk.de angefordert.
     
     Der folgende Link loggt dich direkt in deinen Account ein:
     https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin } 
     
-    Falls das nicht du warst, mach dir keine Sorgen, dein Account ist weiterhin geschützt.
+    Falls das nicht du warst, mach dir keine Sorgen, dein Account ist weiterhin geschuetzt.
     Nutze einfach ab jetzt den neuen Login-Link zum einloggen.
 registration-mail =
-    Jemand (vermutlich du) hat einen Account auf https://geschenke.oli-obk.de für { $email_address } erstellt.
+    Jemand (vermutlich du) hat einen Account auf https://geschenke.oli-obk.de fuer { $email_address } erstellt.
     
     Der folgende Link loggt dich direkt in deinen Account ein:
     https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin } 
     
     Falls jemand fremdes dies getan hat, klicke auf
     https://geschenke.oli-obk.de/nuke/{ $autologin }.
-    um deinen Account wieder zu löschen.
+    um deinen Account wieder zu loeschen.
 invite-mail =
-    { $who } hat seine Wunschliste für dich ({ $email_address }) freigegeben
+    Hallo { $name },
     
-    Der folgende Link führt direkt zur Wunschliste:
+    { $who } hat seine Wunschliste fuer dich ({ $email_address }) freigegeben
+    
+    Der folgende Link fuehrt direkt zur Wunschliste:
     https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }&wishlist={$inviter_id}
     
-    Wenn du nicht möchtest, dass deine Emailaddresse in unserer Datenbank gespeichert wird, klicke auf
+    Wenn du nicht moechtest, dass deine Emailaddresse in unserer Datenbank gespeichert wird, klicke auf
     https://geschenke.oli-obk.de/nuke/{ $autologin }.
-    um die Emailaddresse zu löschen.
+    um die Emailaddresse zu loeschen.
 
 ## dashboard (logged_in)
 home = Home
