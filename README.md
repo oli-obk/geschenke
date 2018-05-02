@@ -24,11 +24,18 @@ sudo apt install postgresql-9.6
 
 sudo su - postgres
 psql
-CREATE USER username WITH PASSWORD 'mypw' SUPERUSER;
+CREATE USER geschenke WITH PASSWORD 'geschenke' SUPERUSER;
 CREATE DATABASE geschenke;
 \q
 exit
 ```
+
+Show all databases: `\l`
+Show all tables in the current database: `\dt`
+Connect to a database: `\c DATABASENAME`
+Delete a database (connect to a different database first!): `DROP DATABASE databasename;`
+Show current user: `select current_user;`
+Change role: `set role USERNAME;`
 
 ## https
 
