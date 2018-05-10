@@ -49,6 +49,7 @@ pub fn add_friend(
                             "email_address" => new_friend.get().email.clone(),
                             "autologin" => autologin,
                             "name" => new_friend.get().name.clone(),
+                            "forward" => format!("/user/{}", user.0),
                             "who" => my_user_name(&*conn, user)?,
                         },
                     );

@@ -121,7 +121,7 @@ invite-mail =
     { $who } hat seine Wunschliste fuer dich ({ $email_address }) freigegeben
     
     Der folgende Link fuehrt direkt zur Wunschliste:
-    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }
+    https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }&forward={$forward}
     
     Wenn du nicht moechtest, dass deine Emailaddresse in unserer Datenbank gespeichert wird, klicke auf
     https://geschenke.oli-obk.de/nuke/{ $autologin }.

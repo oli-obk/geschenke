@@ -30,15 +30,17 @@ struct Recover {
 }
 
 #[derive(FromForm)]
-struct Key {
+struct KeyLogin {
     key: String,
+    forward: Option<String>,
 }
 
-#[get("/login_form_key?<key>")]
-fn login_key(conn: DbConn, mut cookies: Cookies, key: Key) -> QueryResult<Flash<Redirect>> {
-    if let Some(id) = login_with_key(&*conn, &key.key)? {
+#[get("/login_form_key?<login>")]
+fn login_key(conn: DbConn, mut cookies: Cookies, login: KeyLogin) -> QueryResult<Flash<Redirect>> {
+    if let Some(id) = login_with_key(&*conn, &login.key)? {
         cookies.add_private(Cookie::new("user_id", id.to_string()));
-        Ok(Flash::success(Redirect::to("/"), "Successfully logged in."))
+        let target = login.forward.as_ref().map_or("/", |f| f);
+        Ok(Flash::success(Redirect::to(target), "Successfully logged in."))
     } else {
         Ok(Flash::error(Redirect::to("/"), "Wrong or old login key"))
     }
