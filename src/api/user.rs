@@ -172,7 +172,9 @@ pub fn print_wishlist(
                             @if let Some(gifter) = present.gifter_id {
                                 td {
                                     @if gifter == me.0 {
-                                        : "Reserved by you";
+                                        : "Reserved by you. Click ";
+                                        a(href = format!("/present/free/{}", present.id)) { : "here" }
+                                        : " to unreserve";
                                     } else {
                                         : "Reserved by ";
                                         a(href = format!("/user/{}", gifter)) { : present.gifter; }

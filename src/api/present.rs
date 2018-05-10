@@ -122,6 +122,21 @@ fn gift(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Flash<Redirect
     ))
 }
 
+#[get("/free/<id>")]
+fn free(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Flash<Redirect>> {
+    let present = diesel::update(
+        presents::table.filter(presents::id.eq(id).and(presents::recipient.ne(user.0))),
+    ).set((
+        presents::reserved_date.eq(None::<NaiveDateTime>),
+        presents::gifter.eq(None::<i32>),
+    ))
+        .get_result::<Present>(&*conn)?;
+    Ok(Flash::success(
+        Redirect::to(&format!("/user/{}", present.recipient)),
+        "You are not gifting this present anymore",
+    ))
+}
+
 #[get("/edit/<id>")]
 fn view(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Content<String>> {
     let present = ::geschenke::get_present(&*conn, user.0, id)?;

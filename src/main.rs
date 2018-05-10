@@ -55,6 +55,7 @@ fn main() {
                 api::present::add,
                 api::present::delete,
                 api::present::gift,
+                api::present::free,
             ],
         )
         .mount(
