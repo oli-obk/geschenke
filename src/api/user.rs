@@ -143,6 +143,7 @@ pub fn print_wishlist(
     conn: DbConn,
     me: UserId,
     user: ::geschenke::UserId,
+    lang: Lang
 ) -> QueryResult<(impl RenderOnce, String)> {
     let you = me.0 == user;
     let title = if you {
@@ -211,7 +212,7 @@ pub fn print_wishlist(
         }
         form(action=user_url, method="post") {
             input (name = "short_description", placeholder = "short description");
-            button { : "Create new present" }
+            button { : lang.format("create-present", None) }
         }
     ),
         title,
@@ -226,6 +227,6 @@ pub fn view(
     flash: Option<FlashMessage>,
     lang: Lang,
 ) -> QueryResult<Content<String>> {
-    let (wishlist, title) = print_wishlist(conn, me, user)?;
+    let (wishlist, title) = print_wishlist(conn, me, user, lang)?;
     Ok(ui::render(&title, flash, lang, wishlist))
 }
