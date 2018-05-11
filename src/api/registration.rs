@@ -26,13 +26,12 @@ fn create_user_form(
     user: Form<User>,
     lang: Lang,
 ) -> QueryResult<Flash<Redirect>> {
-    match create_user(&*conn, mailstrom, &user.get(), lang) {
+    match create_user(&*conn, mailstrom, &user.get(), lang.clone()) {
         Ok(()) => Ok(Flash::success(
             Redirect::to("/"),
-            format!(
-                "An email with login instructions has been sent to {}",
-                user.get().email
-            ),
+            lang.format("email-sent", fluent_map!{
+                "email" => user.get().email,
+            }),
         )),
         Err(err) => user_creation_error(err),
     }
