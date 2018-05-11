@@ -94,10 +94,10 @@ info-login =
 
 info-enter-correct-email =
     {
-        [duzen] Achte darauf unten die richtige { mail }adresse anzugeben. Wenn du die falsche { mail }adresse angeben, werden keine { mail }s verschickt
-       *[siezen] Achten Sie darauf unten die richtige { mail }adresse anzugeben. Wenn Sie die falsche { mail }adresse angeben, werden keine { mail }s verschickt
+        [duzen] Achte darauf unten die richtige { mail }adresse anzugeben. Wenn du die falsche { mail }adresse angeben, werden keine { mail }s verschickt.
+       *[siezen] Achten Sie darauf unten die richtige { mail }adresse anzugeben. Wenn Sie die falsche { mail }adresse angeben, werden keine { mail }s verschickt.
     }
-info-resend-login-mail = Login { mail } erneut senden
+info-resend-login-mail = Login { mail } erneut senden.
 
 ## emails
 login-mail =
@@ -138,11 +138,11 @@ add-friend = Freund hinzufügen
 logout = Abmelden
 
 ## registration
-email-sent = Eine Email mit Login-Angaben wurde an { $email } geschickt
-email-alread-registered = Diese Emailaddresse ist bereits registriert
-email-invalid = Dies ist keine korrekte Emailaddresse
+email-sent = Eine Email mit Login-Angaben wurde an { $email } geschickt.
+email-alread-registered = Diese Emailaddresse ist bereits registriert.
+email-invalid = Dies ist keine korrekte Emailaddresse.
 email-not-sent = 
     {
-        [duzen] Bitte kontaktiere einen Admin, die Email konnte nicht versendet werden
-       *[siezen] Bitte kontaktieren Sie einen Admin, die Email konnte nicht versendet werden
+        [duzen] Bitte kontaktiere einen Admin, die Email konnte nicht versendet werden.
+       *[siezen] Bitte kontaktieren Sie einen Admin, die Email konnte nicht versendet werden.
     }

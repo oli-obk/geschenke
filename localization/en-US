@@ -51,7 +51,7 @@ name = Name
 ## info texts
 info-login = To login click on the login link that is in every email that you get.
 info-enter-correct-email = Make sure to enter the correct email address below, no emails will be sent if you enter a wrong email address.
-info-resend-login-mail = Resend login email
+info-resend-login-mail = Resend login email.
 
 ## emails
 login-mail =
@@ -101,7 +101,7 @@ add-friend = Add friend
 logout = Logout
 
 ## registration
-email-sent = An email with login instructions has been sent to { $email }
-email-alread-registered = This email is already registered
-email-invalid = That's not an email address
-email-not-sent = Please contact an admin, emails could not be sent
+email-sent = An email with login instructions has been sent to { $email }.
+email-alread-registered = This email is already registered.
+email-invalid = That's not an email address.
+email-not-sent = Please contact an admin, emails could not be sent.
