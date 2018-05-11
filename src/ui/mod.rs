@@ -41,6 +41,7 @@ pub fn send_mail(
 pub fn render<PAGE: RenderOnce>(
     title: &str,
     flash: Option<FlashMessage>,
+    lang: Lang,
     page: PAGE,
 ) -> Content<String> {
     let page = html!(
@@ -54,9 +55,9 @@ pub fn render<PAGE: RenderOnce>(
                     span (style = flash.name()) {: flash.msg() }
                     br;
                 }
-                a(href="/") { :"Home" }
+                a(href="/") { : lang.format("home", None) }
                 : " | ";
-                a(href="/account/logout") { :"Logout" }
+                a(href="/account/logout") { : lang.format("logout", None) }
                 h1 { : title }
                 :page;
             }

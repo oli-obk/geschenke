@@ -135,7 +135,7 @@ login-subject = Login { app-name }
 registration-subject = { app-name } Registrierung
 
 ## dashboard (logged_in)
-home = Home
+home = Startseite
 intro = Hallo, { $name }.
 wishlist = Deine Wunschliste
 friends = Freunde

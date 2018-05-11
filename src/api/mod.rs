@@ -40,7 +40,7 @@ fn hello(
     flash: Option<FlashMessage>,
 ) -> QueryResult<Content<String>> {
     if let Some(user) = user {
-        logged_in::hello_user(conn, user, flash)
+        logged_in::hello_user(conn, user, lang, flash)
     } else {
         Ok(Content(ContentType::HTML, hello_generic(flash, lang)))
     }
