@@ -44,6 +44,7 @@ fn add(
     conn: DbConn,
     user: UserId,
     recipient: ::geschenke::UserId,
+    lang: Lang,
     data: Option<Form<Add>>,
 ) -> QueryResult<Flash<Redirect>> {
     if let Some(data) = data {
@@ -59,14 +60,14 @@ fn add(
         match present {
             Ok(present) => Ok(Flash::success(
                 Redirect::to(&format!("/present/edit/{}", present.id)),
-                "Added new present",
+                lang.format("added-present", None),
             )),
             Err(Error::DatabaseError(DatabaseErrorKind::UniqueViolation, ref what))
                 if what.constraint_name() == Some("no_dups_present_short_descriptions") =>
             {
                 Ok(Flash::error(
                     Redirect::to(&format!("/user/{}", recipient)),
-                    "A present with the same name already exists",
+                    lang.format("present-exists", None),
                 ))
             }
             Err(other) => Err(other),
@@ -74,7 +75,7 @@ fn add(
     } else {
         Ok(Flash::error(
             Redirect::to(&format!("/user/{}", recipient)),
-            "Cannot add a present without a description",
+            lang.format("adding-without-description", None),
         ))
     }
 }
@@ -86,6 +87,7 @@ fn edit(
     conn: DbConn,
     _user: UserId,
     id: PresentId,
+    lang: Lang,
     data: Form<Edit>,
 ) -> QueryResult<Flash<Redirect>> {
     let present = update(presents::table.filter(presents::id.eq(id)))
@@ -93,22 +95,22 @@ fn edit(
         .get_result::<Present>(&*conn)?;
     Ok(Flash::success(
         Redirect::to(&format!("/user/{}", present.recipient)),
-        "Present saved",
+        lang.format("present-saved", None),
     ))
 }
 
 #[get("/delete/<id>")]
-fn delete(conn: DbConn, _user: UserId, id: PresentId) -> QueryResult<Flash<Redirect>> {
+fn delete(conn: DbConn, _user: UserId, id: PresentId, lang: Lang) -> QueryResult<Flash<Redirect>> {
     let present =
         diesel::delete(presents::table.filter(presents::id.eq(id))).get_result::<Present>(&*conn)?;
     Ok(Flash::success(
         Redirect::to(&format!("/user/{}", present.recipient)),
-        "Deleted present",
+        lang.format("present-deleted", None),
     ))
 }
 
 #[get("/gift/<id>")]
-fn gift(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Flash<Redirect>> {
+fn gift(conn: DbConn, user: UserId, id: PresentId, lang: Lang) -> QueryResult<Flash<Redirect>> {
     let now: NaiveDateTime = Utc::now().naive_utc();
     let present = diesel::update(
         presents::table.filter(presents::id.eq(id).and(presents::recipient.ne(user.0))),
@@ -119,12 +121,12 @@ fn gift(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Flash<Redirect
         .get_result::<Present>(&*conn)?;
     Ok(Flash::success(
         Redirect::to(&format!("/user/{}", present.recipient)),
-        "Everybody can now see that you are going to gift this present",
+        lang.format("info-gifting", None),
     ))
 }
 
 #[get("/free/<id>")]
-fn free(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Flash<Redirect>> {
+fn free(conn: DbConn, user: UserId, id: PresentId, lang: Lang) -> QueryResult<Flash<Redirect>> {
     let present = diesel::update(
         presents::table.filter(presents::id.eq(id).and(presents::recipient.ne(user.0))),
     ).set((
@@ -134,7 +136,7 @@ fn free(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Flash<Redirect
         .get_result::<Present>(&*conn)?;
     Ok(Flash::success(
         Redirect::to(&format!("/user/{}", present.recipient)),
-        "You are not gifting this present anymore",
+        lang.format("info-not-gifting", None),
     ))
 }
 

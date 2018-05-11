@@ -55,7 +55,7 @@ pub fn add_friend(
                     );
                     id
                 },
-                Err(err) => return user_creation_error(err),
+                Err(err) => return user_creation_error(err, lang),
             }
         }
     };
@@ -89,7 +89,7 @@ pub fn add_friend(
         Info::SelfHugging => {
             return Ok(Flash::error(
                 Redirect::to("/"),
-                "You cannot befriend yourself",
+                lang.format("friend-self-hugging", None),
             ))
         }
     }

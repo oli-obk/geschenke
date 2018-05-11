@@ -26,7 +26,7 @@ fn create_user_form(
     user: Form<User>,
     lang: Lang,
 ) -> QueryResult<Flash<Redirect>> {
-    match create_user(&*conn, mailstrom, &user.get(), lang) {
+    match create_user(&*conn, mailstrom, &user.get(), lang.clone()) {
         Ok(()) => Ok(Flash::success(
             Redirect::to("/"),
             format!(
@@ -34,7 +34,7 @@ fn create_user_form(
                 user.get().email
             ),
         )),
-        Err(err) => user_creation_error(err),
+        Err(err) => user_creation_error(err, lang),
     }
 }
 
@@ -75,20 +75,21 @@ pub fn try_create_user(
 }
 
 pub fn user_creation_error(
-    err: UserCreationError
+    err: UserCreationError,
+    lang: Lang
 ) -> QueryResult<Flash<Redirect>> {
     match err {
         UserCreationError::EmailAlreadyExists => Ok(Flash::error(
             Redirect::to("/"),
-            "This email is already registered",
+            lang.format("email-already-registered", None),
         )),
         UserCreationError::InvalidEmailAddress => Ok(Flash::error(
             Redirect::to("/"),
-            "That's not an email address",
+            lang.format("email-invalid", None),
         )),
         UserCreationError::CouldNotSendMail => Ok(Flash::error(
             Redirect::to("/"),
-            "Please contact an admin, emails could not be sent",
+            lang.format("email-not-sent", None),
         )),
         UserCreationError::Diesel(diesel) => Err(diesel),
     }
