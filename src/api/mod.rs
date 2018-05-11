@@ -65,30 +65,30 @@ fn hello_generic(flash: Option<FlashMessage>, lang: Lang) -> String {
                     a(href="debugging/user_info") { : "info about current user"} br;
                 }
                 @if option_env!("ROCKET_ENV") != Some("production") {
-                    h1 { : "Login" }
+                    h1 { : lang.format("login", None) }
                     form(action="account/login_form", method="post") {
                         :"Email:"; input(name="email"); br;
                         :"Password:"; input(type="password", name="password"); br;
-                        button { : "Login" }
+                        button { : lang.format("login", None) }
                     }
-                    h1 { : "Login with key" }
+                    h1 { : lang.format("login-with-key", None) }
                     form(action="account/login_form_key", method="get") {
                         :"Key:"; input(name="key"); br;
-                        button { : "Login" }
+                        button { : lang.format("login", None) }
                     }
                 }
                 : lang.format("info-login", None); br;
-                h1 { : "Register" }
+                h1 { : lang.format("register", None) }
                 form(action="registration/register_form", method="post") {
                     :"Name:";  input(name="name" ); br;
                     :"Email:"; input(name="email"); br;
-                    button { : "Register" }
+                    button { : lang.format("register", None) }
                 }
-                h1 { : "Forgotten Login" }
-                : "Make sure to enter the correct email address below, no emails will be sent if you enter a wrong email address.";
+                h1 { : lang.format("forgotten-login", None) }
+                : lang.format("info-enter-correct-email", None);
                 form(action="account/recover", method="post") {
                     :"Email:"; input(name="email"); br;
-                    button { : "Resend login email" }
+                    button { : lang.format("info-resend-login-mail", None) }
                 }
             }
         }
