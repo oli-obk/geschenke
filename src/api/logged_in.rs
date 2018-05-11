@@ -26,7 +26,7 @@ pub fn hello_user(
         .filter(friends::id.eq(int_id))
         .select((users::name, users::id))
         .load::<(String, ::geschenke::UserId)>(&*conn)?;
-    let (wishlist, _) = print_wishlist(conn, id, int_id, lang)?;
+    let (wishlist, _) = print_wishlist(conn, id, int_id, lang.clone())?;
     let title = lang.format(
         "intro",
         fluent_map!{
