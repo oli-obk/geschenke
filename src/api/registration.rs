@@ -30,7 +30,7 @@ fn create_user_form(
         Ok(()) => Ok(Flash::success(
             Redirect::to("/"),
             lang.format("email-sent", fluent_map!{
-                "email" => user.get().email,
+                "email" => user.get().email.clone(),
             }),
         )),
         Err(err) => user_creation_error(err),
