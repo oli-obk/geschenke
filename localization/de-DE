@@ -129,14 +129,18 @@ invite-mail =
 
 ## dashboard (logged_in)
 home = Home
-intro = Hello, { $name }.
-wishlist = Your wishlist
-friends = Friends
-add-friend = Add friend
-logout = Logout
+intro = Hallo, { $name }.
+wishlist = Deine Wunschliste
+friends = Freunde
+add-friend = Freund hinzufügen
+logout = Abmelden
 
 ## registration
-email-sent = An email with login instructions has been sent to { $email }
-email-alread-registered = This email is already registered
-email-invalid = That's not an email address
-email-not-sent = Please contact an admin, emails could not be sent
+email-sent = Eine Email mit Login-Angaben wurde an { $email } geschickt
+email-alread-registered = Diese Emailaddresse ist bereits registriert
+email-invalid = Dies ist keine korrekte Emailaddresse
+email-not-sent = 
+    {
+        [duzen] Bitte kontaktiere einen Admin, die Email konnte nicht versendet werden
+       *[siezen] Bitte kontaktieren Sie einen Admin, die Email konnte nicht versendet werden
+    }
