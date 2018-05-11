@@ -41,9 +41,9 @@ pub fn add_friend(
                 Ok((id, autologin)) => {
                     ui::send_mail(
                         mailstrom,
-                        lang,
+                        lang.clone(),
                         &new_friend.get().email,
-                        "Geschenke App Invitation",
+                        &lang.format("invitation-subject", None),
                         "invite-mail",
                         fluent_map!{
                             "email_address" => new_friend.get().email.clone(),
@@ -85,7 +85,7 @@ pub fn add_friend(
     // we already have this friend
     match try(friend, user.0)? {
         Info::Ok => {}
-        Info::Already => return Ok(Flash::error(Redirect::to("/"), "You are already friends")),
+        Info::Already => return Ok(Flash::error(Redirect::to("/"), lang.format("already-friends", None))),
         Info::SelfHugging => {
             return Ok(Flash::error(
                 Redirect::to("/"),
@@ -97,7 +97,7 @@ pub fn add_friend(
     // try adding the reverse friendship, but ignore if already exists
     try(user.0, friend)?;
 
-    Ok(Flash::error(Redirect::to("/"), "Added new friend"))
+    Ok(Flash::error(Redirect::to("/"), lang.format("added-friend", None)))
 }
 
 #[post("/friend/remove", data = "<delete_friend>")]
@@ -105,12 +105,13 @@ pub fn remove_friend(
     conn: DbConn,
     user: UserId,
     delete_friend: Form<RemoveUser>,
+    lang: Lang,
 ) -> QueryResult<Flash<Redirect>> {
     let id = friends::id.eq(user.0);
     let friend_id = friends::friend.eq(delete_friend.get().id);
     let query = friends::table.filter(id.and(friend_id));
     if delete(query).execute(&*conn).is_ok() {
-        Ok(Flash::success(Redirect::to("/"), "Deleted friend"))
+        Ok(Flash::success(Redirect::to("/"), lang.format("deleted-friend", None)))
     } else {
         Ok(Flash::error(Redirect::to("/"), "Could not delete friend"))
     }
@@ -223,7 +224,8 @@ pub fn view(
     me: UserId,
     user: ::geschenke::UserId,
     flash: Option<FlashMessage>,
+    lang: Lang,
 ) -> QueryResult<Content<String>> {
     let (wishlist, title) = print_wishlist(conn, me, user)?;
-    Ok(ui::render(&title, flash, wishlist))
+    Ok(ui::render(&title, flash, lang, wishlist))
 }

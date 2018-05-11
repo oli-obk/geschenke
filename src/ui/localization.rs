@@ -22,6 +22,7 @@ impl<'a> Lang<'a> {
     }
 }
 
+#[derive(Clone)]
 pub struct Lang<'a> {
     // contexts ordered in the preferred user order
     ctx: Vec<&'a MessageContext<'static>>,

@@ -10,6 +10,7 @@ use rocket::request::{Form, FromFormValue};
 use rocket::response::Content;
 use rocket::response::{Flash, Redirect};
 use ui;
+use ui::localization::Lang;
 
 #[derive(Deserialize, FromForm)]
 struct Edit {
@@ -138,12 +139,12 @@ fn free(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Flash<Redirect
 }
 
 #[get("/edit/<id>")]
-fn view(conn: DbConn, user: UserId, id: PresentId) -> QueryResult<Content<String>> {
+fn view(conn: DbConn, user: UserId, id: PresentId, lang: Lang) -> QueryResult<Content<String>> {
     let present = ::geschenke::get_present(&*conn, user.0, id)?;
-    render(conn, user, present)
+    render(conn, user, present, lang)
 }
 
-fn render(conn: DbConn, user: UserId, present: Present) -> QueryResult<Content<String>> {
+fn render(conn: DbConn, user: UserId, present: Present, lang: Lang) -> QueryResult<Content<String>> {
     let you = present.recipient == user.0;
     let recipient_name = if you {
         "You".to_string()
@@ -173,6 +174,7 @@ fn render(conn: DbConn, user: UserId, present: Present) -> QueryResult<Content<S
     Ok(ui::render(
         &short_description,
         None,
+        lang,
         html!(
         form(action=format!("/present/edit/{}", id), method="post") {
             :"The present is for ";

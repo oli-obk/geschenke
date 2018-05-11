@@ -7,12 +7,14 @@ use pool::DbConn;
 use rocket::request::FlashMessage;
 use rocket::response::Content;
 use ui;
+use ui::localization::Lang;
 
 use super::UserId;
 
 pub fn hello_user(
     conn: DbConn,
     id: UserId,
+    lang: Lang,
     flash: Option<FlashMessage>,
 ) -> QueryResult<Content<String>> {
     let int_id = id.0;
@@ -25,15 +27,21 @@ pub fn hello_user(
         .select((users::name, users::id))
         .load::<(String, ::geschenke::UserId)>(&*conn)?;
     let (wishlist, _) = print_wishlist(conn, id, int_id)?;
-    let title = format!("Hello {}!", user_info.name);
+    let title = lang.format(
+        "intro",
+        fluent_map!{
+            "name" => user_info.name,
+        }
+    );
     Ok(ui::render(
         &title,
         flash,
+        lang.clone(),
         html!(
-        h2 { : "Your wishlist" }
+        h2 { : lang.format("wishlist", None) }
         // make this reusable in /user/id
         : wishlist;
-        h2 { :"Friends" }
+        h2 { : lang.format("friends", None) }
         table {
             @for (friend, id) in friends {
                 tr {
@@ -43,16 +51,16 @@ pub fn hello_user(
                     td {
                         form(action="user/friend/remove", method="post") {
                             input (name = "id", value = id, type = "hidden");
-                            button { : "Delete" }
+                            button { : lang.format("delete", None) }
                         }
                     }
                 }
             }
         }
         form(action="user/friend/add", method="post") {
-            input (name = "name", placeholder = "name") {}
-            input (name = "email", placeholder = "email address") {}
-            button { : "Add friend" }
+            input (name = "name", placeholder = lang.format("name", None)) {}
+            input (name = "email", placeholder = lang.format("mail", None)) {}
+            button { : lang.format("add-friend", None) }
         }
     ),
     ))

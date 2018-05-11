@@ -91,9 +91,9 @@ pub fn recover_login(
     if updated == 1 {
         send_mail(
             mailstrom,
-            lang,
+            lang.clone(),
             email_address,
-            "Geschenke App Login",
+            &lang.format("login-subject", None),
             "login-mail",
             fluent_map!{
                 "autologin" => new_autologin,

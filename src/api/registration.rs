@@ -104,9 +104,9 @@ fn create_user(
             // added new entry
             send_mail(
                 mailstrom,
-                lang,
+                lang.clone(),
                 &user.email,
-                "Geschenke App Registration",
+                &lang.format("registration-subject", None),
                 "registration-mail",
                 fluent_map!{
                     "email_address" => user.email.clone(),
