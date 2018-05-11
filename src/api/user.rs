@@ -41,9 +41,9 @@ pub fn add_friend(
                 Ok((id, autologin)) => {
                     ui::send_mail(
                         mailstrom,
-                        lang,
+                        lang.clone(),
                         &new_friend.get().email,
-                        "Geschenke App Invitation",
+                        &lang.format("invitation-subject", None),
                         "invite-mail",
                         fluent_map!{
                             "email_address" => new_friend.get().email.clone(),

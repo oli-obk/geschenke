@@ -129,6 +129,11 @@ invite-mail =
     https://geschenke.oli-obk.de/nuke/{ $autologin }.
     um die Emailaddresse zu loeschen.
 
+## email subjects
+invitation-subject = Einladung zur { app-name }
+login-subject = Login { app-name }
+registration-subject = { app-name } Registrierung
+
 ## dashboard (logged_in)
 home = Home
 intro = Hallo, { $name }.

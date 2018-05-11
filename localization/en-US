@@ -5,7 +5,7 @@ you-big = You
 you-small = you
 
 ## app name
-app-name = Geschenkeplanungsapp
+app-name = Geschenke App
 
 ## add friend
 already-friends = You are already friends
@@ -91,6 +91,11 @@ invite-mail =
     If you do not want your email address to be stored in our database, visit
     https://geschenke.oli-obk.de/nuke/{ $autologin }.
     to remove it.
+
+## email subjects
+invitation-subject = { app-name } Invitation
+login-subject = { app-name } Login
+registration-subject = { app-name } Registration
 
 ## dashboard (logged_in)
 home = Home
