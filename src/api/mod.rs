@@ -67,27 +67,27 @@ fn hello_generic(flash: Option<FlashMessage>, lang: Lang) -> String {
                 @if option_env!("ROCKET_ENV") != Some("production") {
                     h1 { : lang.format("login", None) }
                     form(action="account/login_form", method="post") {
-                        :"Email:"; input(name="email"); br;
-                        :"Password:"; input(type="password", name="password"); br;
+                        :lang.format("mail", None); : ":"; input(name="email"); br;
+                        :lang.format("password", None); : ":"; input(type="password", name="password"); br;
                         button { : lang.format("login", None) }
                     }
                     h1 { : lang.format("login-with-key", None) }
                     form(action="account/login_form_key", method="get") {
-                        :"Key:"; input(name="key"); br;
+                        :lang.format("key", None); : ":"; input(name="key"); br;
                         button { : lang.format("login", None) }
                     }
                 }
                 : lang.format("info-login", None); br;
                 h1 { : lang.format("register", None) }
                 form(action="registration/register_form", method="post") {
-                    :"Name:";  input(name="name" ); br;
-                    :"Email:"; input(name="email"); br;
+                    :lang.format("name", None); : ":";  input(name="name" ); br;
+                    :lang.format("mail", None); : ":"; input(name="email"); br;
                     button { : lang.format("register", None) }
                 }
                 h1 { : lang.format("forgotten-login", None) }
                 : lang.format("info-enter-correct-email", None);
                 form(action="account/recover", method="post") {
-                    :"Email:"; input(name="email"); br;
+                    :lang.format("mail", None); : ":"; input(name="email"); br;
                     button { : lang.format("info-resend-login-mail", None) }
                 }
             }

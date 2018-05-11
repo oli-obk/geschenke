@@ -139,11 +139,12 @@ fn user_name(
         .get_result::<String>(conn)
 }
 
-pub fn print_wishlist(
+pub fn print_wishlist<'a>(
     conn: DbConn,
     me: UserId,
     user: ::geschenke::UserId,
-) -> QueryResult<(impl RenderOnce, String)> {
+    lang: Lang<'a>
+) -> QueryResult<(impl RenderOnce + 'a, String)> {
     let you = me.0 == user;
     let title = if you {
         "Your wishlist".to_owned()
@@ -211,7 +212,7 @@ pub fn print_wishlist(
         }
         form(action=user_url, method="post") {
             input (name = "short_description", placeholder = "short description");
-            button { : "Create new present" }
+            button { : lang.format("create-present", None) }
         }
     ),
         title,
@@ -226,6 +227,6 @@ pub fn view(
     flash: Option<FlashMessage>,
     lang: Lang,
 ) -> QueryResult<Content<String>> {
-    let (wishlist, title) = print_wishlist(conn, me, user)?;
+    let (wishlist, title) = print_wishlist(conn, me, user, lang.clone())?;
     Ok(ui::render(&title, flash, lang, wishlist))
 }
