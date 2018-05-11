@@ -41,10 +41,12 @@ forgotten-login = Forgotten Login
 
 ## Login interface
 login = Login
+login-with-key = Login with key
 register = Register
 mail = E-Mail
 password = Password
 key = Key
+name = Name
 
 ## info texts
 info-login = To login click on the login link that is in every email that you get.

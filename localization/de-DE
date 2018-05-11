@@ -62,10 +62,12 @@ forgotten-login = Login vergessen
 
 ## Login interface
 login = Login
+login-with-key = Login mit Schlüssel
 register = Registrieren
 mail = E-Mail
 password = Passwort
 key = Schlüssel
+name = Name
 
 ## info texts
 click =
