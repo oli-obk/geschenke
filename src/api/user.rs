@@ -147,10 +147,15 @@ pub fn print_wishlist<'a>(
 ) -> QueryResult<(impl RenderOnce + 'a, String)> {
     let you = me.0 == user;
     let title = if you {
-        "Your wishlist".to_owned()
+        lang.format("wishlist", None).to_owned()
     } else {
         let name = user_name(&*conn, me, user)?;
-        format!("{}'s wishlist", name)
+        lang.format(
+            "someones-wishlist", 
+            fluent_map!{
+                "name" => name,
+            }
+        )
     };
     let presents = show_presents_for_user(&*conn, me.0, user)?;
     let user_url = format!("/present/add/{}", user);
@@ -160,12 +165,12 @@ pub fn print_wishlist<'a>(
         @if !presents.is_empty() {
             table(border=1) {
                 tr {
-                    th { : "Present" }
+                    th { : lang.format("present", None) }
                     @if !you {
-                        th { : "Status" }
+                        th { : lang.format("status", None) }
                     }
-                    th { : "Details" }
-                    th { : "Delete" }
+                    th { : lang.format("details", None) }
+                    th { : lang.format("delete", None) }
                 }
                 @for present in presents {
                     tr {
@@ -174,25 +179,25 @@ pub fn print_wishlist<'a>(
                             @if let Some(gifter) = present.gifter_id {
                                 td {
                                     @if gifter == me.0 {
-                                        : "Reserved by you. Click ";
-                                        a(href = format!("/present/free/{}", present.id)) { : "here" }
-                                        : " to unreserve";
+                                        : lang.format("reserved-by-you", None); : ". "; : lang.format("click", None);
+                                        a(href = format!("/present/free/{}", present.id)) { : lang.format("here", None) }
+                                        : " "; : lang.format("unreserve", None);
                                     } else {
-                                        : "Reserved by ";
+                                        : lang.format("reserved-by", None); : " ";
                                         a(href = format!("/user/{}", gifter)) { : present.gifter; }
                                     }
                                 }
                             } else {
                                 td {
-                                    :"Available, click ";
-                                    a(href = format!("/present/gift/{}", present.id)) { : "here" }
-                                    :" to claim";
+                                    : lang.format("available", None); : ". "; : lang.format("click", None);
+                                    a(href = format!("/present/gift/{}", present.id)) { : lang.format("here", None) }
+                                    : " "; : lang.format("claim", None);
                                 }
                             }
                         }
                         td {
                             // FIXME: make description not an option anymore
-                            a(href = format!("/present/edit/{}", present.id)) { : "Edit" }
+                            a(href = format!("/present/edit/{}", present.id)) { : lang.format("edit", None) }
                             @if let Some(descr) = present.description {
                                 @if !descr.is_empty() {
                                     details {
@@ -202,16 +207,16 @@ pub fn print_wishlist<'a>(
                             }
                         }
                         td {
-                            a(href = format!("/present/delete/{}", present.id)) { : "Delete" }
+                            a(href = format!("/present/delete/{}", present.id)) { : lang.format("delete", None) }
                         }
                     }
                 }
             }
         } else {
-            : "No presents in your wishlist. Add some to let others know what you want"
+            : lang.format("no-presents", None)
         }
         form(action=user_url, method="post") {
-            input (name = "short_description", placeholder = "short description");
+            input (name = "short_description", placeholder = lang.format("short-description", None));
             button { : lang.format("create-present", None) }
         }
     ),

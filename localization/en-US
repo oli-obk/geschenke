@@ -24,13 +24,27 @@ create-present = Create new present
 recipient = The present is for { $recipient }
 description = Description
 save = Save
+no-presents = No presents in your wishlist. Add some to let others know what you want.
 
 ## present addition/editing/removal
+status = Status
+details = Details
+present = Present
 added-present = Added new present
 present-exists = A present with the same name already exists
 not-adding-without-description = Cannot add a present without a description
 present-saved = Present saved
 present-deleted = Deleted present
+present-for = The present is for 
+present-reserved = On { $date } { $gifter } selected this present to gift to 
+reserved-by = Reserved by
+reserved-by-you = { reserved-by } you
+click = Click
+here = here
+unreserve = to unreserve
+available = Available
+claim = to claim
+short-description = short description
 
 ## Logging in/out
 login-successful = Successfully logged in.
@@ -103,6 +117,7 @@ registration-subject = { app-name } Registration
 home = Home
 intro = Hello, { $name }.
 wishlist = Your wishlist
+somenones-wishlist = { $name }'s wishtlist
 friends = Friends
 add-friend = Add friend
 logout = Logout

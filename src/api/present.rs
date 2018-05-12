@@ -176,25 +176,27 @@ fn render(conn: DbConn, user: UserId, present: Present, lang: Lang) -> QueryResu
     Ok(ui::render(
         &short_description,
         None,
-        lang,
+        lang.clone(),
         html!(
         form(action=format!("/present/edit/{}", id), method="post") {
-            :"The present is for ";
+            :lang.format("present-for", None);
             :&recipient; br;
             @if !you {
                 @if let Some(reserved_date) = reserved_date {
-                    :"On ";
-                    :reserved_date.format("%Y-%m-%d").to_string();
-                    :" ";
-                    :gifter.unwrap();
-                    :" selected this present to gift to ";
-                    :recipient;
+                    :lang.format(
+                        "present-reserved",
+                        fluent_map!{
+                            "date" => reserved_date.format("%Y-%m-%d").to_string(),
+                            "gifter" => gifter.unwrap(),
+                        }
+                    );
+                    : recipient;
                 }
             }
             br;
-            :"Description:";
+            :lang.format("description", None); : ":";
             input(type="textarea", name="description", value = description); br;
-            button { : "Save" }
+            button { : lang.format("save", None) }
         }
     ),
     ))

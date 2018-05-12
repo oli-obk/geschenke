@@ -45,13 +45,27 @@ create-present = Neues Geschenk erstellen
 recipient = Das Geschenk ist für { $recipient }
 description = Beschreibung
 save = Speichern
+no-presents = Es stehen keine Geschenke auf deiner Wunschliste. Füge Geschenke hinzu, damit andere wissen was du dir wünschst.
 
 # present addition/editing/removal
+status = Status
+details = Details
+present = Geschenk
 added-present = Neues Geschenk hinzugefügt
 present-exists = Ein Geschenk mit dem gleichen Namen existiert bereits
 not-adding-without-description = Ein Geschenk kann nicht ohne Beschreibung hinzugefügt werden
 present-saved = Geschenk gespeichert
 present-deleted = Geschenk gelöscht
+present-for = Das Geschenk ist für 
+present-reserved = Am { $date } hat { $gifter } dieses Geschenk ausgewählt um es zu verschenken an 
+reserved-by = Reserviert von
+reserved-by-you = { reserved-by } dir
+click = Klick
+here = hier
+unreserve = um es freizugeben
+available = Verfügbar
+claim = um es zu reservieren
+short-description = Kurzbeschreibung
 
 ## Logging in/out
 login-successful = Erfolgreich eingeloggt.
@@ -148,6 +162,7 @@ registration-subject = { app-name } Registrierung
 home = Startseite
 intro = Hallo, { $name }.
 wishlist = Deine Wunschliste
+somenones-wishlist = { $name }s Wunschliste
 friends = Freunde
 add-friend = Freund hinzufügen
 logout = Abmelden
