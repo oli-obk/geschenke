@@ -21,7 +21,6 @@ friend-not-deleted = Could not delete friend
 delete = Delete
 edit = Edit
 create-present = Create new present
-recipient = The present is for { $recipient }
 description = Description
 save = Save
 no-presents = No presents in your wishlist. Add some to let others know what you want.

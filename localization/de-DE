@@ -42,7 +42,6 @@ friend-not-deleted = Freund konnte nicht gelöscht werden
 delete = Löschen
 edit = Bearbeiten
 create-present = Neues Geschenk erstellen
-recipient = Das Geschenk ist für { $recipient }
 description = Beschreibung
 save = Speichern
 no-presents = Es stehen keine Geschenke auf deiner Wunschliste. Füge Geschenke hinzu, damit andere wissen was du dir wünschst.
