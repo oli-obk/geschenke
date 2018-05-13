@@ -13,9 +13,9 @@ use ui::send_mail;
 
 /// Remove the `user_id` cookie.
 #[get("/logout")]
-fn logout(mut cookies: Cookies) -> Flash<Redirect> {
+fn logout(mut cookies: Cookies, lang: Lang) -> Flash<Redirect> {
     cookies.remove_private(Cookie::named("user_id"));
-    Flash::success(Redirect::to("/"), "Successfully logged out.")
+    Flash::success(Redirect::to("/"), lang.format("logout-successful", None))
 }
 
 #[derive(Deserialize, FromForm)]
