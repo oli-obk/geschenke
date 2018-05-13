@@ -189,7 +189,7 @@ pub fn print_wishlist<'a>(
                                 }
                             } else {
                                 td {
-                                    : lang.format("available", None); : ", "; : lang.format("click", None);
+                                    : lang.format("available", None); : ", "; : lang.format("click", None); : " ";
                                     a(href = format!("/present/gift/{}", present.id)) { : lang.format("here", None) }
                                     : " "; : lang.format("claim", None);
                                 }
