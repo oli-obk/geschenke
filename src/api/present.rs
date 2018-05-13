@@ -149,7 +149,7 @@ fn view(conn: DbConn, user: UserId, id: PresentId, lang: Lang) -> QueryResult<Co
 fn render(conn: DbConn, user: UserId, present: Present, lang: Lang) -> QueryResult<Content<String>> {
     let you = present.recipient == user.0;
     let recipient_name = if you {
-        "You".to_string()
+        lang.format("you-akkusativ", None).to_string()
     } else {
         users::table
             .filter(users::id.eq(present.recipient))

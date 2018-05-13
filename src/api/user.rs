@@ -179,7 +179,7 @@ pub fn print_wishlist<'a>(
                             @if let Some(gifter) = present.gifter_id {
                                 td {
                                     @if gifter == me.0 {
-                                        : lang.format("reserved-by-you", None); : ". "; : lang.format("click", None);
+                                        : lang.format("reserved-by-you", None); : ", "; : lang.format("click", None); : " ";
                                         a(href = format!("/present/free/{}", present.id)) { : lang.format("here", None) }
                                         : " "; : lang.format("unreserve", None);
                                     } else {
@@ -189,7 +189,7 @@ pub fn print_wishlist<'a>(
                                 }
                             } else {
                                 td {
-                                    : lang.format("available", None); : ". "; : lang.format("click", None);
+                                    : lang.format("available", None); : ", "; : lang.format("click", None);
                                     a(href = format!("/present/gift/{}", present.id)) { : lang.format("here", None) }
                                     : " "; : lang.format("claim", None);
                                 }

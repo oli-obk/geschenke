@@ -3,6 +3,7 @@ hello-world = Hello, world!
 ## general stuff
 you-big = You
 you-small = you
+you-akkusativ = you
 
 ## app name
 app-name = Geschenke App
@@ -38,7 +39,7 @@ present-for = The present is for
 present-reserved = On { $date } { $gifter } selected this present to gift to 
 reserved-by = Reserved by
 reserved-by-you = { reserved-by } you
-click = Click
+click = click
 here = here
 unreserve = to unreserve
 available = Available
@@ -60,6 +61,9 @@ mail = E-Mail
 password = Password
 key = Key
 name = Name
+
+# login recovery
+new-key-sent = Email with new login key sent
 
 ## info texts
 info-login = To login click on the login link that is in every email that you get.

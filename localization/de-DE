@@ -16,6 +16,11 @@ yourself =
         [duzen] dich
        *[siezen] sich
     }
+you-akkusativ =
+    {
+        [duzen] dich
+       *[siezen] Sie
+    }
 
 ## app name
 app-name = Geschenkeplanungsapp
@@ -81,6 +86,9 @@ mail = E-Mail
 password = Passwort
 key = Schlüssel
 name = Name
+
+# login recovery
+new-key-sent = Email mit neuem Loginschlüssel wurde gesendet.
 
 ## info texts
 click =
