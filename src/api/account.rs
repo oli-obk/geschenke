@@ -36,25 +36,25 @@ struct KeyLogin {
 }
 
 #[get("/login_form_key?<login>")]
-fn login_key(conn: DbConn, mut cookies: Cookies, login: KeyLogin) -> QueryResult<Flash<Redirect>> {
+fn login_key(conn: DbConn, mut cookies: Cookies, login: KeyLogin, lang: Lang) -> QueryResult<Flash<Redirect>> {
     if let Some(id) = login_with_key(&*conn, &login.key)? {
         cookies.add_private(Cookie::new("user_id", id.to_string()));
         let target = login.forward.as_ref().map_or("/", |f| f);
-        Ok(Flash::success(Redirect::to(target), "Successfully logged in."))
+        Ok(Flash::success(Redirect::to(target), lang.format("login-successful", None)))
     } else {
-        Ok(Flash::error(Redirect::to("/"), "Wrong or old login key"))
+        Ok(Flash::error(Redirect::to("/"), lang.format("wrong-key", None)))
     }
 }
 
 #[post("/login_form", data = "<login>")]
-fn login(conn: DbConn, mut cookies: Cookies, login: Form<Login>) -> QueryResult<Flash<Redirect>> {
+fn login(conn: DbConn, mut cookies: Cookies, login: Form<Login>, lang: Lang) -> QueryResult<Flash<Redirect>> {
     if let Some(id) = login_with_password(&*conn, &login.get().email, &login.get().password)? {
         cookies.add_private(Cookie::new("user_id", id.to_string()));
-        Ok(Flash::success(Redirect::to("/"), "Successfully logged in."))
+        Ok(Flash::success(Redirect::to("/"), lang.format("login-successful", None)))
     } else {
         Ok(Flash::error(
             Redirect::to("/"),
-            "Unknown email address or wrong password",
+            lang.format("wrong-mail-or-password", None),
         ))
     }
 }
@@ -68,12 +68,12 @@ fn recover(
 ) -> QueryResult<Flash<Redirect>> {
     let email = &recover.get().email;
     let new_autologin = ::api::registration::gen_autologin();
-    recover_login(&*conn, email, &new_autologin, mailstrom, lang)?;
+    recover_login(&*conn, email, &new_autologin, mailstrom, lang.clone())?;
 
     // we don't leak whether that user has an account
     Ok(Flash::success(
         Redirect::to("/"),
-        "Email with new login key sent",
+        lang.format("new-key-sent", None),
     ))
 }
 
