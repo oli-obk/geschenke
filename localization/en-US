@@ -23,6 +23,7 @@ delete = Delete
 edit = Edit
 create-present = Create new present
 description = Description
+show-description = show description
 save = Save
 no-presents = No presents in your wishlist. Add some to let others know what you want.
 

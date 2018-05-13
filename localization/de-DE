@@ -48,6 +48,7 @@ delete = Löschen
 edit = Bearbeiten
 create-present = Neues Geschenk erstellen
 description = Beschreibung
+show-description = Beschreibung ansehen
 save = Speichern
 no-presents = Es stehen keine Geschenke auf deiner Wunschliste. Füge Geschenke hinzu, damit andere wissen was du dir wünschst.
 

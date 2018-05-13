@@ -201,6 +201,7 @@ pub fn print_wishlist<'a>(
                             @if let Some(descr) = present.description {
                                 @if !descr.is_empty() {
                                     details {
+                                        summary { : lang.format("show-description", None);}
                                         : descr;
                                     }
                                 }
