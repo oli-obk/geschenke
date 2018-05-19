@@ -17,6 +17,11 @@ rustup component add rust-analysis
 ```bash
 sudo apt-get install libpq-dev
 cargo install diesel_cli --no-default-features --features postgres
+```
+
+### old
+
+```bash
 sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt update
@@ -36,6 +41,20 @@ Connect to a database: `\c DATABASENAME`
 Delete a database (connect to a different database first!): `DROP DATABASE databasename;`
 Show current user: `select current_user;`
 Change role: `set role USERNAME;`
+
+### docker
+
+```bash
+apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+apt-key fingerprint 0EBFCD88
+vi /etc/apt/sources.list # add next line
+deb [arch=amd64] https://download.docker.com/linux/debian stretch stable
+apt-get update
+apt-get install docker-ce
+usermod -G docker USER
+docker run --name geschenke-postgres -e POSTGRES_PASSWORD=geschenke -e POSTGRES_USER=geschenke -p=5432:5432 -d postgres && docker ps
+```
 
 ## https
 
