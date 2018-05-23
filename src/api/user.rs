@@ -97,7 +97,7 @@ pub fn add_friend(
     // try adding the reverse friendship, but ignore if already exists
     try(user.0, friend)?;
 
-    Ok(Flash::error(Redirect::to("/"), lang.format("added-friend", None)))
+    Ok(Flash::success(Redirect::to("/"), lang.format("added-friend", None)))
 }
 
 #[post("/friend/remove", data = "<delete_friend>")]
