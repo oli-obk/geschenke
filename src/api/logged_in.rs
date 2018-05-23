@@ -62,6 +62,9 @@ pub fn hello_user(
             input (type = "email", name = "email", placeholder = lang.format("mail", None)) {}
             button { : lang.format("add-friend", None) }
         }
+        a(href="user/friend/custom-add", method="get") {
+            : lang.format("custom-add-friend", None);
+        }
     ),
     ))
 }

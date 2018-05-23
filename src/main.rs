@@ -62,6 +62,8 @@ fn main() {
             "/user",
             routes![
                 api::user::add_friend,
+                api::user::custom_add_friend,
+                api::user::custom_add_friend_apply,
                 api::user::remove_friend,
                 api::user::view,
             ],

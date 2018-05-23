@@ -236,3 +236,47 @@ pub fn view(
     let (wishlist, title) = print_wishlist(conn, me, user, lang.clone())?;
     Ok(ui::render(&title, flash, lang, wishlist))
 }
+
+#[get("/friend/custom-add")]
+pub fn custom_add_friend(
+    flash: Option<FlashMessage>,
+    lang: Lang,
+) -> QueryResult<Content<String>> {
+    let name_msg = lang.format("name", None);
+    let email_msg = lang.format("mail", None);
+    Ok(ui::render(
+        &lang.format("custom-add-friend-title", None),
+        flash,
+        lang.clone(),
+        html!(
+            h2 { : lang.format("custom-add-friend-title", None) }
+            form(action="user/friend/custom-add", method="post") {
+                textarea (
+                    name = "body",
+                    placeholder = lang.format("mail_body", None),
+                    required,
+                    wrap = "soft",
+                    cols = "50",
+                    rows = "10"
+                ) {}
+                table {
+                    tr {
+                        td { : &name_msg; }
+                        td { : &email_msg; }
+                    }
+                    @for i in 0..20 {
+                        tr {
+                            td {
+                                input (name = format!("name{}", i), placeholder = &name_msg) {}
+                            }
+                            td {
+                                input (type = format!("email{}", i), name = "email", placeholder = &email_msg) {}
+                            }
+                        }
+                    }
+                }
+                button { : lang.format("add-friends", None) }
+            }
+        ),
+    ))
+}

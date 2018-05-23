@@ -173,7 +173,13 @@ wishlist = Deine Wunschliste
 someones-wishlist = { $name }s Wunschliste
 friends = Freunde
 add-friend = Freund hinzufügen
+custom-add-friend = Freund(e) mit einer persönlichen Nachricht einladen
 logout = Abmelden
+
+## mass-mail
+custom-add-friend-title = Freunde einladen
+add-friends = Freunde einladen
+mail_body = Eine persönliche Nachricht zusammen mit der Einladung versenden
 
 ## registration
 email-sent = Eine Email mit Login-Angaben wurde an { $email } geschickt.
