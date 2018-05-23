@@ -59,7 +59,7 @@ pub fn hello_user(
         }
         form(action="user/friend/add", method="post") {
             input (name = "name", placeholder = lang.format("name", None)) {}
-            input (name = "email", placeholder = lang.format("mail", None)) {}
+            input (type = "email", name = "email", placeholder = lang.format("mail", None)) {}
             button { : lang.format("add-friend", None) }
         }
     ),
