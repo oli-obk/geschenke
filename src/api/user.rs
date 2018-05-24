@@ -299,7 +299,7 @@ impl<'f> FromForm<'f> for CustomAdd {
         }
         body.map(|body| CustomAdd {
             body,
-            users: users.into_iter().map(|(_, (name, email))| User { name, email }).collect(),
+            users: users.into_iter().map(|(_, (name, email))| User { name, email }).filter(|u| !u.email.is_empty()).collect(),
         }).ok_or("no custom email body".to_owned())
     }
 }
