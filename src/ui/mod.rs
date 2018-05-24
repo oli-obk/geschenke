@@ -32,7 +32,7 @@ pub fn send_mail(
     email.set_sender("geschenke@oli-obk.de").unwrap();
     email.set_to(email_address).unwrap();
     email.set_subject(caption).unwrap();
-    let body = lang.format(id, args).replace('\n', "\r\n");
+    let body = lang.format(id, args).replace('\r', "").replace('\n', "\r\n");
     email.set_body(&*body).unwrap();
 
     mailstrom.lock().unwrap().send_email(email).unwrap();
