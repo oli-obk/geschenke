@@ -100,7 +100,9 @@ registration-mail =
 invite-mail =
     Hi { $name },
     
-    { $who } has invited you ({ $email_address }) to see their wishlist at https://geschenke.oli-obk.de .
+    { $who } has invited you ({ $email_address }) to see their wishlist:
+
+    { $custom_msg }
     
     Click the following link to see the wishlist:
     https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }&forward={$forward}

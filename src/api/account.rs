@@ -90,7 +90,7 @@ pub fn recover_login(
     assert!(updated <= 1);
     if updated == 1 {
         send_mail(
-            mailstrom,
+            &mailstrom,
             lang.clone(),
             email_address,
             &lang.format("login-subject", None),

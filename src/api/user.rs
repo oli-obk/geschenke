@@ -8,13 +8,14 @@ use api::registration::{try_create_user, User, user_creation_error};
 use horrorshow::RenderOnce;
 use pool::DbConn;
 use rocket::request::FlashMessage;
-use rocket::request::Form;
+use rocket::request::{Form, FromForm, FormItems};
 use rocket::response::Content;
 use rocket::response::{Flash, Redirect};
 use ui;
 use rocket::State;
 use mail::Mail;
 use ui::localization::Lang;
+use std::collections::HashMap;
 
 #[derive(Deserialize, FromForm)]
 pub struct RemoveUser {
@@ -29,28 +30,40 @@ pub fn add_friend(
     lang: Lang,
     new_friend: Form<User>,
 ) -> QueryResult<Flash<Redirect>> {
+    add_friend_generic(&*conn, user, &mailstrom, lang, new_friend.get(), None)
+}
+
+fn add_friend_generic(
+    conn: &PgConnection,
+    user: UserId,
+    mailstrom: &State<Mail>,
+    lang: Lang,
+    new_friend: &User,
+    custom_message: Option<&str>,
+) -> QueryResult<Flash<Redirect>> {
     let friend = users::table
-        .filter(users::email.eq(&new_friend.get().email))
+        .filter(users::email.eq(&new_friend.email))
         .select(users::id)
         .get_result::<::geschenke::UserId>(&*conn)
         .optional()?;
     let friend = match friend {
         Some(friend) => friend,
         None => {
-            match try_create_user(&*conn, &new_friend.get()) {
+            match try_create_user(&*conn, &new_friend) {
                 Ok((id, autologin)) => {
                     ui::send_mail(
                         mailstrom,
                         lang.clone(),
-                        &new_friend.get().email,
+                        &new_friend.email,
                         &lang.format("invitation-subject", None),
                         "invite-mail",
                         fluent_map!{
-                            "email_address" => new_friend.get().email.clone(),
+                            "email_address" => new_friend.email.clone(),
                             "autologin" => autologin,
-                            "name" => new_friend.get().name.clone(),
+                            "name" => new_friend.name.clone(),
                             "forward" => format!("/user/{}", user.0),
                             "who" => my_user_name(&*conn, user)?,
+                            "custom_msg" => custom_message.unwrap_or_default(),
                         },
                     );
                     id
@@ -237,6 +250,78 @@ pub fn view(
     Ok(ui::render(&title, flash, lang, wishlist))
 }
 
+#[derive(Deserialize)]
+pub struct CustomAdd {
+    body: String,
+    users: Vec<User>,
+}
+
+impl<'f> FromForm<'f> for CustomAdd {
+    // In practice, we'd use a more descriptive error type.
+    type Error = String;
+
+    fn from_form(items: &mut FormItems<'f>, strict: bool) -> Result<CustomAdd, String> {
+        let mut body = None;
+        let mut users: HashMap<usize, (String, String)> = HashMap::new();
+
+        for (key, value) in items {
+            match key.as_str() {
+                "body" if body.is_none() => {
+                    let decoded = value.url_decode().map_err(|e| e.to_string())?;
+                    body = Some(decoded);
+                }
+                "body" if strict => return Err("duplicate body".to_owned()),
+                _ => {
+                    if key.starts_with("name") {
+                        let id = key.trim_left_matches("name").parse::<usize>().map_err(|e| e.to_string())?;
+                        let decoded = value.url_decode().map_err(|e| e.to_string())?;
+                        let name = &mut users.entry(id).or_default().0;
+                        if strict && !name.is_empty() {
+                            return Err("duplicate name".to_owned());
+                        }
+                        *name = decoded;
+                    } else if key.starts_with("email") {
+                        let id = key.trim_left_matches("email").parse::<usize>().map_err(|e| e.to_string())?;
+                        let decoded = value.url_decode().map_err(|e| e.to_string())?;
+                        let email = &mut users.entry(id).or_default().1;
+                        if strict && !email.is_empty() {
+                            return Err("duplicate email".to_owned());
+                        }
+                        *email = decoded;
+                    } else if strict {
+                        return Err("unknown field".to_owned());
+                    }
+                }
+            }
+        }
+        if users.is_empty() {
+            return Err("no addresses to send to".to_owned());
+        }
+        body.map(|body| CustomAdd {
+            body,
+            users: users.into_iter().map(|(_, (name, email))| User { name, email }).collect(),
+        }).ok_or("no custom email body".to_owned())
+    }
+}
+
+#[post("/friend/custom-add", data = "<data>")]
+pub fn custom_add_friend_apply(
+    conn: DbConn,
+    user: UserId,
+    mailstrom: State<Mail>,
+    lang: Lang,
+    data: Form<CustomAdd>,
+) -> QueryResult<Flash<Redirect>> {
+    let mut redirect = Flash::error(
+        Redirect::to("/"),
+        "BUG: users field cannot be empty!",
+    );
+    for friend in &data.get().users {
+        redirect = add_friend_generic(&*conn, user, &mailstrom, lang.clone(), friend, Some(&data.get().body))?;
+    }
+    Ok(redirect)
+}
+
 #[get("/friend/custom-add")]
 pub fn custom_add_friend(
     flash: Option<FlashMessage>,
@@ -250,7 +335,7 @@ pub fn custom_add_friend(
         lang.clone(),
         html!(
             h2 { : lang.format("custom-add-friend-title", None) }
-            form(action="user/friend/custom-add", method="post") {
+            form(action="custom-add", method="post") {
                 textarea (
                     name = "body",
                     placeholder = lang.format("mail_body", None),
@@ -270,7 +355,7 @@ pub fn custom_add_friend(
                                 input (name = format!("name{}", i), placeholder = &name_msg) {}
                             }
                             td {
-                                input (type = format!("email{}", i), name = "email", placeholder = &email_msg) {}
+                                input (name = format!("email{}", i), type = "email", placeholder = &email_msg) {}
                             }
                         }
                     }

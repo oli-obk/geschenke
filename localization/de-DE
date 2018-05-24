@@ -152,7 +152,9 @@ registration-mail =
 invite-mail =
     Hallo { $name },
     
-    { $who } hat seine Wunschliste fuer dich ({ $email_address }) freigegeben
+    { $who } hat seine Wunschliste fuer dich ({ $email_address }) freigegeben:
+
+    { $custom_msg }
     
     Der folgende Link fuehrt direkt zur Wunschliste:
     https://geschenke.oli-obk.de/account/login_form_key?key={ $autologin }&forward={$forward}

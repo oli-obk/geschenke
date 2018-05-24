@@ -16,7 +16,7 @@ use fluent::types::FluentValue;
 pub mod localization;
 
 pub fn send_mail(
-    mailstrom: State<Mail>,
+    mailstrom: &State<Mail>,
     lang: Lang,
     email_address: &str,
     caption: &str,

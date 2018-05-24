@@ -104,7 +104,7 @@ fn create_user(
         Ok((_, autologin)) => {
             // added new entry
             send_mail(
-                mailstrom,
+                &mailstrom,
                 lang.clone(),
                 &user.email,
                 &lang.format("registration-subject", None),

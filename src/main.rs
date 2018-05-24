@@ -1,5 +1,6 @@
 #![feature(plugin)]
 #![feature(custom_derive)]
+#![feature(entry_or_default)]
 #![plugin(rocket_codegen)]
 
 extern crate diesel;
