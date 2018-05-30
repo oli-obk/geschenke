@@ -11,6 +11,7 @@ use rocket::State;
 use ui::localization::Lang;
 use std::collections::HashMap;
 use fluent::types::FluentValue;
+use asciifier::asciifier::Asciifier;
 
 #[macro_use]
 pub mod localization;
@@ -32,7 +33,10 @@ pub fn send_mail(
     email.set_sender("geschenke@oli-obk.de").unwrap();
     email.set_to(email_address).unwrap();
     email.set_subject(caption).unwrap();
-    let body = lang.format(id, args).replace('\r', "").replace('\n', "\r\n");
+    let asciifier = Asciifier::new();
+    let body = asciifier.to_ascii(
+        lang.format(id, args).replace('\r', "").replace('\n', "\r\n")
+    );
     email.set_body(&*body).unwrap();
 
     mailstrom.lock().unwrap().send_email(email).unwrap();

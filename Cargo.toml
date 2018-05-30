@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [dependencies]
 accept-language = "1.1.0"
+asciifier = "0.0.2"
 dotenv = "0.9.0"
 fluent = "0.2.0"
 mailstrom = "0.4.0"

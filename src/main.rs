@@ -23,6 +23,7 @@ extern crate accept_language;
 extern crate fluent;
 #[macro_use]
 extern crate maplit;
+extern crate asciifier;
 
 use rocket::Request;
 
