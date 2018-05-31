@@ -183,6 +183,7 @@ pub fn print_wishlist<'a>(
                         th { : lang.format("status", None) }
                     }
                     th { : lang.format("details", None) }
+                    th { : lang.format("edit", None)}
                     th { : lang.format("delete", None) }
                 }
                 @for present in presents {
@@ -210,7 +211,6 @@ pub fn print_wishlist<'a>(
                         }
                         td {
                             // FIXME: make description not an option anymore
-                            a(href = format!("/present/edit/{}", present.id)) { : lang.format("edit", None) }
                             @if let Some(descr) = present.description {
                                 @if !descr.is_empty() {
                                     details {
@@ -219,6 +219,9 @@ pub fn print_wishlist<'a>(
                                     }
                                 }
                             }
+                        }
+                        td {
+                            a(href = format!("/present/edit/{}", present.id)) { : lang.format("edit", None) }
                         }
                         td {
                             a(href = format!("/present/delete/{}", present.id)) { : lang.format("delete", None) }
