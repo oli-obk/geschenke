@@ -213,10 +213,11 @@ pub fn print_wishlist<'a>(
                             // FIXME: make description not an option anymore
                             @if let Some(descr) = present.description {
                                 @if !descr.is_empty() {
-                                    details {
+                                    : descr;
+                                    /*details {
                                         summary { : lang.format("show-description", None);}
                                         : descr;
-                                    }
+                                    }*/
                                 }
                             }
                         }
