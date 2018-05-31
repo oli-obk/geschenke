@@ -14,6 +14,7 @@ use ui::localization::Lang;
 
 #[derive(Deserialize, FromForm)]
 struct Edit {
+    short_description: String,
     description: String,
 }
 
@@ -90,6 +91,9 @@ fn edit(
     lang: Lang,
     data: Form<Edit>,
 ) -> QueryResult<Flash<Redirect>> {
+    update(presents::table.filter(presents::id.eq(id)))
+        .set(presents::short_description.eq(&data.get().short_description))
+        .get_result::<Present>(&*conn)?;
     let present = update(presents::table.filter(presents::id.eq(id)))
         .set(presents::description.eq(&data.get().description))
         .get_result::<Present>(&*conn)?;
@@ -173,8 +177,9 @@ fn render(conn: DbConn, user: UserId, present: Present, lang: Lang) -> QueryResu
         None => None,
     };
     let recipient = html!(a(href=format!("/user/{}", recipient)) { :&recipient_name });
+    // render a page where present name and description can be changed
     Ok(ui::render(
-        &short_description,
+        &short_description.clone(),
         None,
         lang.clone(),
         html!(
@@ -190,12 +195,13 @@ fn render(conn: DbConn, user: UserId, present: Present, lang: Lang) -> QueryResu
                             "gifter" => gifter.unwrap(),
                         }
                     );
-                    : recipient;
+                    : recipient; br; br; br;
                 }
             }
-            br;
-            :lang.format("description", None); : ":";
-            input(type="textarea", name="description", value = description); br;
+            :lang.format("present-name", None); : ": ";
+            input(type="textarea", name="short_description", value = short_description); br; br;
+            :lang.format("description", None); : ": ";
+            input(type="textarea", name="description", value = description); br; br;
             button { : lang.format("save", None) }
         }
     ),

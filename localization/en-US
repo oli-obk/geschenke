@@ -31,6 +31,7 @@ no-presents = No presents in your wishlist. Add some to let others know what you
 status = Status
 details = Details
 present = Present
+present-name = Present name
 added-present = Added new present
 present-exists = A present with the same name already exists
 not-adding-without-description = Cannot add a present without a description

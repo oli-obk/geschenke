@@ -56,6 +56,7 @@ no-presents = Es stehen keine Geschenke auf deiner Wunschliste. Füge Geschenke 
 status = Status
 details = Details
 present = Geschenk
+present-name = Geschenkname
 added-present = Neues Geschenk hinzugefügt
 present-exists = Ein Geschenk mit dem gleichen Namen existiert bereits
 not-adding-without-description = Ein Geschenk kann nicht ohne Beschreibung hinzugefügt werden
