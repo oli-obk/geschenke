@@ -185,9 +185,10 @@ fn render(conn: DbConn, user: UserId, present: Present, lang: Lang) -> QueryResu
         html!(
         form(action=format!("/present/edit/{}", id), method="post") {
             :lang.format("present-for", None);
-            :&recipient; br;
+            :&recipient;
             @if !you {
                 @if let Some(reserved_date) = reserved_date {
+                    br;
                     :lang.format(
                         "present-reserved",
                         fluent_map!{
@@ -195,9 +196,10 @@ fn render(conn: DbConn, user: UserId, present: Present, lang: Lang) -> QueryResu
                             "gifter" => gifter.unwrap(),
                         }
                     );
-                    : recipient; br; br; br;
+                    : recipient;
                 }
             }
+            br; br; br;
             :lang.format("present-name", None); : ": ";
             input(type="textarea", name="short_description", value = short_description); br; br;
             :lang.format("description", None); : ": ";
