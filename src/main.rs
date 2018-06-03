@@ -35,7 +35,10 @@ mod pool;
 
 fn main() {
     let rocket = rocket::ignite()
-        .mount("/", routes![api::hello])
+        .mount("/", routes![
+            api::hello,
+            fuchur,
+        ])
         .mount(
             "/registration",
             routes![api::registration::create_user_form,],
@@ -90,12 +93,22 @@ fn main() {
         .launch();
 }
 
+use rocket::http::ContentType;
+use rocket::response::Content;
+
 #[error(404)]
-fn not_found(req: &Request) -> String {
-    format!("404:<br/>\n{:#?}", req)
+fn not_found(req: &Request) -> Content<String> {
+    Content(ContentType::HTML, format!("<h1>404 Brain Not Found</h1><img src=\"/fuchur.jpg\"/><br/><pre>{:#?}</pre>", req))
 }
 
 #[error(422)]
 fn bad_parse(req: &Request) -> String {
     format!("422:<br/>\n{:#?}", req)
+}
+
+use rocket::response::NamedFile;
+
+#[get("/fuchur.jpg")]
+fn fuchur() -> std::io::Result<NamedFile> {
+    NamedFile::open("fuchur.jpg")
 }
