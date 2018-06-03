@@ -43,35 +43,31 @@ fn add_friend_generic(
 ) -> QueryResult<Flash<Redirect>> {
     let friend = users::table
         .filter(users::email.eq(&new_friend.email))
-        .select(users::id)
-        .get_result::<::geschenke::UserId>(&*conn)
+        .select((users::id, users::autologin))
+        .get_result::<(::geschenke::UserId, String)>(&*conn)
         .optional()?;
-    let friend = match friend {
+    let (friend, autologin) = match friend {
         Some(friend) => friend,
-        None => {
-            match try_create_user(&*conn, &new_friend) {
-                Ok((id, autologin)) => {
-                    ui::send_mail(
-                        mailstrom,
-                        lang.clone(),
-                        &new_friend.email,
-                        &lang.format("invitation-subject", None),
-                        "invite-mail",
-                        fluent_map!{
-                            "email_address" => new_friend.email.clone(),
-                            "autologin" => autologin,
-                            "name" => new_friend.name.clone(),
-                            "forward" => format!("/user/{}", user.0),
-                            "who" => my_user_name(&*conn, user)?,
-                            "custom_msg" => custom_message.unwrap_or_default(),
-                        },
-                    );
-                    id
-                },
-                Err(err) => return user_creation_error(err, lang),
-            }
+        None => match try_create_user(&*conn, &new_friend) {
+            Ok(data) => data,
+            Err(err) => return user_creation_error(err, lang),
         }
     };
+    ui::send_mail(
+        mailstrom,
+        lang.clone(),
+        &new_friend.email,
+        &lang.format("invitation-subject", None),
+        "invite-mail",
+        fluent_map!{
+            "email_address" => new_friend.email.clone(),
+            "autologin" => autologin,
+            "name" => new_friend.name.clone(),
+            "forward" => format!("/user/{}", user.0),
+            "who" => my_user_name(&*conn, user)?,
+            "custom_msg" => custom_message.unwrap_or_default(),
+        },
+    );
     enum Info {
         SelfHugging,
         Already,
@@ -164,7 +160,7 @@ pub fn print_wishlist<'a>(
     } else {
         let name = user_name(&*conn, me, user)?;
         lang.format(
-            "someones-wishlist", 
+            "someones-wishlist",
             fluent_map!{
                 "name" => name,
             }
